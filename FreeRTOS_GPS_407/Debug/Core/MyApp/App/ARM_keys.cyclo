@@ -1,7 +1,3 @@
 ../Core/MyApp/App/ARM_keys.c:23:6:toggle_led	1
-<<<<<<< HEAD
 ../Core/MyApp/App/ARM_keys.c:36:6:ARM_keys_IRQ	5
-=======
-../Core/MyApp/App/ARM_keys.c:36:6:ARM_keys_IRQ	4
->>>>>>> branch 'master' of https://github.com/KarmaMarazu/GPS-Leaphy-ARM.git
 ../Core/MyApp/App/ARM_keys.c:69:6:ARM_keys_task	5
