@@ -51,7 +51,7 @@ void ARM_keys_IRQ (void *argument)
 		// wait for ISR (EXTI0_IRQHandler()) to signal that a key is pressed
 		key = xEventGroupWaitBits(hKEY_Event, 0xffff, pdTRUE, pdFALSE, portMAX_DELAY );
 
-		if (key == 0x0001)
+		if ((key == 0x0001) || (key == 0x0002))
 			xTaskNotify(hData_opslaanTask, key, eSetValueWithOverwrite); // notify task2 with value
 
 		xTaskNotify(hARM_keys, key, eSetValueWithOverwrite); // notify task2 with value

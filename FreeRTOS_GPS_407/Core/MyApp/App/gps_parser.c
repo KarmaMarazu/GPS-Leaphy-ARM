@@ -59,6 +59,13 @@ void data_opslaanTask(void *argument)
 	while(TRUE)
 	{
 		xTaskNotifyWait (0x00, 0xffffffff, &key, portMAX_DELAY);
+
+		if(key == 0x0002) // als resetknop is ingedrukt dan moet de arrat geleegd worden en de teller moet op 0
+		{
+			memset(&waypoints, 0, sizeof(waypoints));
+			i = 0;
+		}
+
 		if (i<=MAX_WAYPOINTS)
 		{
 		    xSemaphoreTake(hGNRMC_Struct_Sem, portMAX_DELAY); // wacht op toegang tot de mutex;
