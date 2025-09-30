@@ -44,22 +44,35 @@ $(wildcard ../makefile.init) \
 $(wildcard ../makefile.targets) \
 
 
+<<<<<<< HEAD
 BUILD_ARTIFACT_NAME := FreeRTOS_GPS_407
+=======
+BUILD_ARTIFACT_NAME := Free
+>>>>>>> branch 'master' of https://github.com/KarmaMarazu/GPS-Leaphy-ARM.git
 BUILD_ARTIFACT_EXTENSION := elf
 BUILD_ARTIFACT_PREFIX :=
 BUILD_ARTIFACT := $(BUILD_ARTIFACT_PREFIX)$(BUILD_ARTIFACT_NAME)$(if $(BUILD_ARTIFACT_EXTENSION),.$(BUILD_ARTIFACT_EXTENSION),)
 
 # Add inputs and outputs from these tool invocations to the build variables 
 EXECUTABLES += \
+<<<<<<< HEAD
 FreeRTOS_GPS_407.elf \
+=======
+Free.elf \
+>>>>>>> branch 'master' of https://github.com/KarmaMarazu/GPS-Leaphy-ARM.git
 
 MAP_FILES += \
+<<<<<<< HEAD
 FreeRTOS_GPS_407.map \
+=======
+Free.map \
+>>>>>>> branch 'master' of https://github.com/KarmaMarazu/GPS-Leaphy-ARM.git
 
 SIZE_OUTPUT += \
 default.size.stdout \
 
 OBJDUMP_LIST += \
+<<<<<<< HEAD
 FreeRTOS_GPS_407.list \
 
 
@@ -88,6 +101,36 @@ FreeRTOS_GPS_407.list: $(EXECUTABLES) makefile objects.list $(OPTIONAL_TOOL_DEPS
 # Other Targets
 clean:
 	-$(RM) FreeRTOS_GPS_407.elf FreeRTOS_GPS_407.list FreeRTOS_GPS_407.map default.size.stdout
+=======
+Free.list \
+
+
+# All Target
+all: main-build
+
+# Main-build Target
+main-build: Free.elf secondary-outputs
+
+# Tool invocations
+Free.elf Free.map: $(OBJS) $(USER_OBJS) E:\HBO\3A\Reflectieve\ Professional\ Embedded\ sys\RTOS\FreeRTOS_GPS_407\FreeRTOS_GPS_407\STM32F407VGTX_FLASH.ld makefile objects.list $(OPTIONAL_TOOL_DEPS)
+	arm-none-eabi-gcc -o "Free.elf" @"objects.list" $(USER_OBJS) $(LIBS) -mcpu=cortex-m4 -T"E:\HBO\3A\Reflectieve Professional Embedded sys\RTOS\FreeRTOS_GPS_407\FreeRTOS_GPS_407\STM32F407VGTX_FLASH.ld" --specs=nosys.specs -Wl,-Map="Free.map" -Wl,--gc-sections -static --specs=nano.specs -mfpu=fpv4-sp-d16 -mfloat-abi=hard -mthumb -u _printf_float -Wl,--start-group -lc -lm -Wl,--end-group
+	@echo 'Finished building target: $@'
+	@echo ' '
+
+default.size.stdout: $(EXECUTABLES) makefile objects.list $(OPTIONAL_TOOL_DEPS)
+	arm-none-eabi-size  $(EXECUTABLES)
+	@echo 'Finished building: $@'
+	@echo ' '
+
+Free.list: $(EXECUTABLES) makefile objects.list $(OPTIONAL_TOOL_DEPS)
+	arm-none-eabi-objdump -h -S $(EXECUTABLES) > "Free.list"
+	@echo 'Finished building: $@'
+	@echo ' '
+
+# Other Targets
+clean:
+	-$(RM) Free.elf Free.list Free.map default.size.stdout
+>>>>>>> branch 'master' of https://github.com/KarmaMarazu/GPS-Leaphy-ARM.git
 	-@echo ' '
 
 secondary-outputs: $(SIZE_OUTPUT) $(OBJDUMP_LIST)
