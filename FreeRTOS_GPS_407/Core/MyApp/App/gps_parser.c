@@ -13,6 +13,8 @@
 extern GNRMC gnrmc; // global struct for GNRMC-messages
 Data_Parser GNRMC_data;
 
+Data_Parser waypoints[MAX_WAYPOINTS]; //{latitude,  longitude,  speed, course}
+
 
 void GNRMC_Parser(void)
 {
@@ -48,4 +50,24 @@ void GNRMC_Parser(void)
 	 	}
 
  	xSemaphoreGive(hGNRMC_Struct_Sem); // geef de mutex weer vrij voor een ander
+}
+
+void data_opslaanTask(void *argument)
+{
+	uint32_t key;
+	int i = 0;
+	while(TRUE)
+	{
+		xTaskNotifyWait (0x00, 0xffffffff, &key, portMAX_DELAY);
+		if (i<=MAX_WAYPOINTS)
+		{
+		    xSemaphoreTake(hGNRMC_Struct_Sem, portMAX_DELAY); // wacht op toegang tot de mutex;
+
+			waypoints[i] = GNRMC_data;
+
+		    xSemaphoreGive(hGNRMC_Struct_Sem); // wacht op toegang tot de mutex;
+
+			i++;
+		}
+	}
 }

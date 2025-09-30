@@ -1,1 +1,2 @@
-../Core/MyApp/App/gps_parser.c:17:6:GNRMC_Parser	40	static
+../Core/MyApp/App/gps_parser.c:19:6:GNRMC_Parser	40	static
+../Core/MyApp/App/gps_parser.c:55:6:data_opslaanTask	32	static

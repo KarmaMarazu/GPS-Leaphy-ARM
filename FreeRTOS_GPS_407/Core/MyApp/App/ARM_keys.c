@@ -36,19 +36,25 @@ void toggle_led (uint32_t color)
 void ARM_keys_IRQ (void *argument)
 {
 	unsigned int key;
-	osThreadId_t hTask;
+	osThreadId_t hARM_keys;
+	osThreadId_t hData_opslaanTask;
 
 	UART_puts("\r\n"); UART_puts((char *)__func__); UART_puts(" started");
 
-	if (!(hTask = xTaskGetHandle("ARM_keys_task")))
+	if (!(hARM_keys = xTaskGetHandle("ARM_keys_task")))
 		error_HaltOS("Err:ARM_hndle");
+	if (!(hData_opslaanTask = xTaskGetHandle("data_opslaan")))
+				error_HaltOS("Err:data_opslaan handle");
 
     while (1)
 	{
 		// wait for ISR (EXTI0_IRQHandler()) to signal that a key is pressed
 		key = xEventGroupWaitBits(hKEY_Event, 0xffff, pdTRUE, pdFALSE, portMAX_DELAY );
 
-		xTaskNotify(hTask, key, eSetValueWithOverwrite); // notify task2 with value
+		if (key == 0x0001)
+			xTaskNotify(hData_opslaanTask, key, eSetValueWithOverwrite); // notify task2 with value
+
+		xTaskNotify(hARM_keys, key, eSetValueWithOverwrite); // notify task2 with value
 	}
 }
 
