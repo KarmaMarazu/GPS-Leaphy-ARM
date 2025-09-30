@@ -127,6 +127,9 @@ extern void UART_menu     (void *);
 // gps.c
 extern void GPS_getNMEA (void *);
 
+// gps_parser.c
+extern void data_opslaanTask (void *);
+
 // student.c
 extern void Student_task1 (void *);
 

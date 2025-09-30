@@ -41,10 +41,10 @@ void ARM_keys_IRQ (void *argument)
 
 	UART_puts("\r\n"); UART_puts((char *)__func__); UART_puts(" started");
 
-	if (!(hARM_keys = xTaskGetHandle("ARM_keys_task")))
+	if (!(hARM_keys = GetTaskhandle("ARM_keys_task")))
 		error_HaltOS("Err:ARM_hndle");
-	if (!(hData_opslaanTask = xTaskGetHandle("data_opslaan")))
-				error_HaltOS("Err:data_opslaan handle");
+	if (!(hData_opslaanTask = GetTaskhandle("data_opslaanTask")))
+		error_HaltOS("Err:data_opslaan handle");
 
     while (1)
 	{

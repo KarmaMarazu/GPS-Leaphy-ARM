@@ -79,7 +79,10 @@ TASKDATA tasks[] =
 { UART_menu,    NULL, .attr.name = "UART_menu",    .attr.stack_size = 600, .attr.priority = osPriorityBelowNormal6 },
 
   // gps.c
-{ GPS_getNMEA,  NULL, .attr.name = "GPS_getNMEA",  .attr.stack_size = 600, .attr.priority = osPriorityNormal2 },
+{ GPS_getNMEA,  NULL, .attr.name = "GPS_getNMEA",  .attr.stack_size = 1200, .attr.priority = osPriorityNormal2 },
+
+  // gps_parser.c
+{ data_opslaanTask, NULL,.attr.name = "data_opslaanTask", .attr.stack_size = 800, .attr.priority = osPriorityNormal2 },
 
   // student.c
 { Student_task1,NULL, .attr.name = "Student_task1",.attr.stack_size = 600, .attr.priority = osPriorityBelowNormal7 },
