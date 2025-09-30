@@ -63,7 +63,7 @@ void data_opslaanTask(void *argument)
 		{
 		    xSemaphoreTake(hGNRMC_Struct_Sem, portMAX_DELAY); // wacht op toegang tot de mutex;
 
-			waypoints[i] = GNRMC_data;
+			waypoints[i] = GNRMC_data; //array vullen met struct
 
 		    xSemaphoreGive(hGNRMC_Struct_Sem); // wacht op toegang tot de mutex;
 
