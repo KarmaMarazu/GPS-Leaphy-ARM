@@ -54,6 +54,9 @@ SPI_HandleTypeDef hspi1;
 
 UART_HandleTypeDef huart4;
 UART_HandleTypeDef huart2;
+unsigned char uart2_char; // keep global!
+unsigned char uart4_char; // keep global!
+
 
 /* Definitions for defaultTask */
 osThreadId_t defaultTaskHandle;
@@ -526,9 +529,6 @@ static void MX_GPIO_Init(void)
   */
 void HAL_UART_RxCpltCallback(UART_HandleTypeDef *huart)
 {
-	unsigned char       uart4_char, uart2_char;
-	BaseType_t          xHigherPriorityTaskWoken = pdFALSE;
-
 	// receive terminal user commands
 	if (huart->Instance == USART2)
 	{
@@ -536,21 +536,17 @@ void HAL_UART_RxCpltCallback(UART_HandleTypeDef *huart)
 		HAL_UART_Receive_IT(&huart2, &uart2_char, 1);
 
 		/// Zet de byte op de UART_queue
-		xQueueSendFromISR(hUART_Queue, &uart2_char, &xHigherPriorityTaskWoken);
-		if (xHigherPriorityTaskWoken != pdFALSE)
-			portYIELD_FROM_ISR(xHigherPriorityTaskWoken); // force context switch
+		xQueueSendFromISR(hUART_Queue, &uart2_char, NULL);
 	}
 
 	// receive GPS-data
-	if (huart->Instance == UART4)
+	else if (huart->Instance == UART4)
 	{
 		/// Receive one byte in interrupt mode
 		HAL_UART_Receive_IT(&huart4, &uart4_char, 1);
 
 		/// Zet de byte op de GPS_queue
-		xQueueSendFromISR(hGPS_Queue, &uart4_char, &xHigherPriorityTaskWoken);
-		if (xHigherPriorityTaskWoken != pdFALSE)
-			portYIELD_FROM_ISR(xHigherPriorityTaskWoken); // force context switch
+		xQueueSendFromISR(hGPS_Queue, &uart4_char, NULL);
 	}
 
 }
@@ -569,16 +565,14 @@ void StartDefaultTask(void *argument)
   /* init code for USB_HOST */
   MX_USB_HOST_Init();
   /* USER CODE BEGIN 5 */
-  unsigned char byte1, byte2;
+  //unsigned char byte1, byte2;
 
   CreateHandles();
   CreateTasks();
 
   // start the interrupt handlers after all handles are created
-  HAL_UART_Receive_IT(&huart2, &byte2, 1); //start the UART2 interrupt engine for reading
-  HAL_UART_Receive_IT(&huart4, &byte1, 1); //start the UART4 interrupt engine GPS
-
-  UART_putint(byte2); UART_puts("\r\n"); // deze byte (de eerste) is nog een irritante bug.
+  HAL_UART_Receive_IT(&huart2, &uart2_char, 1); //start the UART2 interrupt engine for reading
+  HAL_UART_Receive_IT(&huart4, &uart2_char, 1); //start the UART4 interrupt engine GPS
 
   /* Infinite loop */
   for(;;)
@@ -641,3 +635,4 @@ void assert_failed(uint8_t *file, uint32_t line)
   /* USER CODE END 6 */
 }
 #endif /* USE_FULL_ASSERT */
+
