@@ -30,10 +30,10 @@ void GNRMC_Parser(void)
 	if (Uart_debug_out & GPS_DEBUG_OUT)
 	 	{
 			char lat[sizeof(GNRMC_data.latitude)];
-	 		snprintf(lat,sizeof(GNRMC_data.latitude)+1 , "%f", GNRMC_data.latitude);
+	 		snprintf(lat,sizeof(GNRMC_data.latitude)+1, "%f", GNRMC_data.latitude);
 
 	 		char lon[sizeof(GNRMC_data.longitude)];
-	 		snprintf(lon, sizeof(GNRMC_data.longitude)+1 , "%f", GNRMC_data.longitude);
+	 		snprintf(lon, sizeof(GNRMC_data.longitude)+1, "%f", GNRMC_data.longitude);
 
 	 		char spe[sizeof(GNRMC_data.speed)];
 	 		snprintf(spe, sizeof(GNRMC_data.speed)+1, "%f", GNRMC_data.speed);
