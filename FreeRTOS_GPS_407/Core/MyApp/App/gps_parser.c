@@ -17,7 +17,7 @@ Data_Parser GNRMC_data;
 void GNRMC_Parser(void)
 {
 	if(!(gnrmc.status == 'A'))
-		//return;
+		return;
 
     xSemaphoreTake(hGNRMC_Struct_Sem, portMAX_DELAY); // wacht op toegang tot de mutex;
     memset(&GNRMC_data, 0, sizeof(Data_Parser)); // clear the struct
@@ -27,8 +27,8 @@ void GNRMC_Parser(void)
 	GNRMC_data.speed = atof(gnrmc.speed);
 	GNRMC_data.course = atof(gnrmc.course);
 
-	//if (Uart_debug_out & GPS_DEBUG_OUT)
-	 //	{
+	if (Uart_debug_out & GPS_DEBUG_OUT)
+	 	{
 			char lat[sizeof(GNRMC_data.latitude)];
 	 		sprintf(lat, "%d", GNRMC_data.latitude);
 
@@ -45,7 +45,7 @@ void GNRMC_Parser(void)
 			UART_puts("\r\n\t longitude double:\t");  UART_puts(lon);
 			UART_puts("\r\n\t speed double:    \t");  UART_puts(spe);
 			UART_puts("\r\n\t course double:   \t");  UART_puts(cou);
-	 	//}
+	 	}
 
  	xSemaphoreGive(hGNRMC_Struct_Sem); // geef de mutex weer vrij voor een ander
 }
