@@ -1,2 +1,6 @@
 ../Core/MyApp/App/gps_parser.c:19:6:GNRMC_Parser	3
+<<<<<<< HEAD
 ../Core/MyApp/App/gps_parser.c:55:6:data_opslaanTask	3
+=======
+../Core/MyApp/App/gps_parser.c:55:6:data_opslaanTask	2
+>>>>>>> branch 'master' of https://github.com/KarmaMarazu/GPS-Leaphy-ARM.git
