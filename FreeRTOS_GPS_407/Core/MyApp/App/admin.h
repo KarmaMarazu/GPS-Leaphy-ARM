@@ -35,8 +35,8 @@
 * or less. This length limit excludes the $ and the [CR][LF] characters.
 * The data field block, including delimiters is limited to 74 characters or less.
 */
-/// set max waypoints for gps
-#define MAX_WAYPOINTS 30
+/// set max waypoints for gps parser
+#define MAX_WAYPOINTS 31
 /// struct voor taak-gegevens, waaronder de argumenten om een taak aan te maken
 typedef struct TaskData
 {
