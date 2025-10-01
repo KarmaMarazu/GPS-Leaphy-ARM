@@ -32,7 +32,7 @@
 
 /// output strings for initialization
 char *app_name    = "\r\n=== freeRTOS_GPS 407 ===\r\n";
-char *app_nameLCD = "freeRTOS_GPS407"; // max 16 chars
+char *app_nameLCD = "freeRTOS_GPS407"; // max 15 chars
 
 /// default: debug all output to uart
 int Uart_debug_out = DEBUG_OUT_NONE;

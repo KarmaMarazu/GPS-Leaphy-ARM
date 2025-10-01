@@ -79,7 +79,7 @@ void LCD_XY(unsigned int x, unsigned int y)
 // Display wordt gebruikt in 4bits modus,2 regels, 5x7 dots font.
 void LCD_init(void)
 {
-	GPIO_InitTypeDef gpio;	// GPIO init structure
+	GPIO_InitTypeDef gpio;	// GPIO init structure.
 	__HAL_RCC_GPIOE_CLK_ENABLE();
 	__HAL_RCC_GPIOC_CLK_ENABLE();
 	__HAL_RCC_GPIOD_CLK_ENABLE();
