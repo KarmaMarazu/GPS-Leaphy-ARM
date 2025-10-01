@@ -15,7 +15,7 @@ extern void GNRMC_Parser(void);
 
 
 
-// GNRMC struct: all with char-members - should/could be improved with proper data-elements
+/// GNRMC struct: all with char-members - should/could be improved with proper data-elements
 typedef struct _GNRMC
 {
 	char    head[7];       // 0. header
@@ -34,7 +34,7 @@ typedef struct _GNRMC
 	char    cs[4];         // 13.checkum *34
 } GNRMC;
 
-// GNRMC struct: slaat alleen de benodigde locatie data op in correcte datatype
+/// Data_Parser struct: slaat alleen de benodigde data op in correcte datatypen
 typedef struct _Data_Parser
 {
 	double  latitude;  		// 3. ddmm.mmmm (double)

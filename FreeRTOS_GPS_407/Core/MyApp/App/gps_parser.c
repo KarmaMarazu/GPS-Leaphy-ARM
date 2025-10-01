@@ -1,9 +1,11 @@
-/*
- * gps_parser.c
- *
- *  Created on: Sep 25, 2025
- *      Author: Twan
- */
+/**
+* @file gps_parser.c
+* @brief Veranderd de data die binnen komt in gps.c zodat dit bruikbare cijfers worden. <BR>
+* Bevat functie die het opslaan van waypoints regelt
+* @author Twan Ton, Mika Dahlkamp, Thomas van Ooijen en Jasper Verduin
+*
+* @date 1/10/2025.
+*/
 
 #include <admin.h>
 #include "main.h"
@@ -15,7 +17,12 @@ Data_Parser GNRMC_data;
 
 Data_Parser waypoints[MAX_WAYPOINTS]; //{latitude,  longitude,  speed, course}
 
-
+/**
+* @brief De chars van de ingevulde GNRMC struct moeten omgezet worden naar rekenbare cijfers
+* om van chars naar doubles te gaan gebruik je atof().<BR>
+* Vervolgens wordt deze data in een Data_Parser struct gestopt
+* @return void
+*/
 void GNRMC_Parser(void)
 {
 	if(!(gnrmc.status == 'A'))
@@ -52,6 +59,11 @@ void GNRMC_Parser(void)
  	xSemaphoreGive(hGNRMC_Struct_Sem); // geef de mutex weer vrij voor een ander
 }
 
+/**
+* @brief de opgeslagen rekenbare data kan worden opgeslagen met een knop op het ARM-bordje.<BR>
+* Ook kan deze opgeslagen waypoints gerest kunnen worden met een andere knop. Deze knop krijgt de task door van ARM_keys_IRQ
+* @return void
+*/
 void data_opslaanTask(void *argument)
 {
 	uint32_t key;
