@@ -55,7 +55,7 @@ void GNRMC_Parser(void)
 void data_opslaanTask(void *argument)
 {
 	uint32_t key;
-	int i = 0;
+	int i = 1;
 	while(TRUE)
 	{
 		xTaskNotifyWait (0x00, 0xffffffff, &key, portMAX_DELAY);
@@ -66,15 +66,24 @@ void data_opslaanTask(void *argument)
 			i = 0;
 		}
 
-		if (i<=MAX_WAYPOINTS)
+		if (i<MAX_WAYPOINTS)
 		{
 		    xSemaphoreTake(hGNRMC_Struct_Sem, portMAX_DELAY); // wacht op toegang tot de mutex;
+		    LCD_clear();
+		    LCD_putint(i);
+		    LCD_put("/30 waypoints");
+		    osDelay(100);
 
 			waypoints[i] = GNRMC_data; //array vullen met struct
 
 		    xSemaphoreGive(hGNRMC_Struct_Sem); // wacht op toegang tot de mutex;
 
 			i++;
+		} else if (i == MAX_WAYPOINTS)
+		{
+			 LCD_put("Limit reached!");
+			 osDelay(100);
+			 i++;
 		}
 	}
 }

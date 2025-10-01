@@ -151,8 +151,8 @@ void LCD_put(char *string)
 
 #ifdef eenregel
     	// vaag display; teken 8 tot 31 is niet uitgevoerd op het scherm
-    	if(curpos==8) // at 8, goto next valid lcd-position
-        for (j=0; j<32; j++) LCD_cursor_right();
+    	if(curpos==15) // at 8, goto next valid lcd-position
+        for (j=0; j<25; j++) LCD_cursor_right();
 #endif
         LCD_putchar(string[k]);
     }
