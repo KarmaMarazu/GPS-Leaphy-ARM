@@ -80,11 +80,12 @@ void data_opslaanTask(void *argument)
 
 		if (i<MAX_WAYPOINTS)
 		{
-		    xSemaphoreTake(hGNRMC_Struct_Sem, portMAX_DELAY); // wacht op toegang tot de mutex;
 		    LCD_clear(); //LCD legen
 		    LCD_putint(i); // waypoint nummer op LCD
 		    LCD_put("/30 waypoints");
 		    osDelay(100);
+
+		    xSemaphoreTake(hGNRMC_Struct_Sem, portMAX_DELAY); // wacht op toegang tot de mutex;
 
 			waypoints[i] = GNRMC_data; //array vullen met struct
 
