@@ -65,7 +65,7 @@ void fill_GNRMC(char *message)
 		UART_puts("\r\n\t speed:    \t");  UART_puts(gnrmc.speed);
 		UART_puts("\r\n\t course:   \t");  UART_puts(gnrmc.course);
 	}
-	GNRMC_Parser();
+	xTaskNotify(GetTaskhandle("GNRMC_Parser"), 0, eNoAction);
 
 }
 

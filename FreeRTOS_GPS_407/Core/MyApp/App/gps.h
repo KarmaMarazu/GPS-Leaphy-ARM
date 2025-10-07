@@ -11,7 +11,7 @@ int hex2int(char *c);
 int hexchar2int(char c);
 int checksum_valid(char *string);
 
-extern void GNRMC_Parser(void);
+//extern void GNRMC_Parser(void);
 
 
 
@@ -51,5 +51,3 @@ enum NMEA
 	eGPGSA,
 	eGNGGA
 };
-
-

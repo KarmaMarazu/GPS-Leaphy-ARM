@@ -15,6 +15,7 @@
 extern GNRMC gnrmc; // global struct for GNRMC-messages
 Data_Parser GNRMC_data;
 
+Data_Parser average[3];
 Data_Parser waypoints[MAX_WAYPOINTS]; //{latitude,  longitude,  speed, course}
 
 /**
@@ -23,20 +24,32 @@ Data_Parser waypoints[MAX_WAYPOINTS]; //{latitude,  longitude,  speed, course}
 * Vervolgens wordt deze data in een Data_Parser struct gestopt
 * @return void
 */
-void GNRMC_Parser(void)
+void GNRMC_Parser(void* argument)
 {
-	if(!(gnrmc.status == 'A'))
-		return;
+	int i = 0; //teller voor schrijven naar average array voor nauwkeurigere waypoint opslaan
 
-    xSemaphoreTake(hGNRMC_Struct_Sem, portMAX_DELAY); // wacht op toegang tot de mutex;
-    memset(&GNRMC_data, 0, sizeof(Data_Parser)); // clear the struct
+	while(TRUE)
+	{
+		xTaskNotifyWait(0,0, NULL, portMAX_DELAY);
+		if(!(gnrmc.status == 'A'))
+			continue;
 
-	GNRMC_data.latitude = atof(gnrmc.latitude);
-	GNRMC_data.longitude = atof(gnrmc.longitude);
-	GNRMC_data.speed = atof(gnrmc.speed);
-	GNRMC_data.course = atof(gnrmc.course);
+		xSemaphoreTake(hGNRMC_Struct_Sem, portMAX_DELAY); // wacht op toegang tot de mutex;
+		memset(&GNRMC_data, 0, sizeof(Data_Parser)); // clear the struct
 
- 	xSemaphoreGive(hGNRMC_Struct_Sem); // geef de mutex weer vrij voor een ander
+		GNRMC_data.latitude = atof(gnrmc.latitude);
+		GNRMC_data.longitude = atof(gnrmc.longitude);
+		GNRMC_data.speed = atof(gnrmc.speed);
+		GNRMC_data.course = atof(gnrmc.course);
+
+		average[i] = GNRMC_data;
+
+		xSemaphoreGive(hGNRMC_Struct_Sem); // geef de mutex weer vrij voor een ander
+
+		i++;
+		if(i >= 3)
+			i = 0;
+	}
 }
 
 /**
@@ -67,7 +80,10 @@ void data_opslaanTask(void *argument)
 
 		    xSemaphoreTake(hGNRMC_Struct_Sem, portMAX_DELAY); // wacht op toegang tot de mutex;
 
-			waypoints[i] = GNRMC_data; //array vullen met struct
+			waypoints[i].latitude = (average[0].latitude + average[1].latitude + average[2].latitude)/3; //array vullen met struct
+			waypoints[i].longitude = (average[0].longitude + average[1].longitude + average[2].longitude)/3; //array vullen met struct
+			waypoints[i].speed = (average[0].speed + average[1].speed + average[2].speed)/3; //array vullen met struct
+			waypoints[i].course = (average[0].course + average[1].course + average[2].course)/3; //array vullen met struct
 
 		    xSemaphoreGive(hGNRMC_Struct_Sem); // wacht op toegang tot de mutex;
 

@@ -126,6 +126,7 @@ extern void UART_menu     (void *);
 
 // gps.c
 extern void GPS_getNMEA (void *);
+extern void GNRMC_Parser(void*);
 
 // gps_parser.c
 extern void data_opslaanTask (void *);
@@ -135,5 +136,3 @@ extern void Student_task1 (void *);
 
 // timer.c
 extern void Timer1_Handler(void);
-
-
