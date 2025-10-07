@@ -37,6 +37,7 @@ typedef struct _GNRMC
 /// Data_Parser struct: slaat alleen de benodigde data op in correcte datatypen
 typedef struct _Data_Parser
 {
+	char 	status;
 	double  latitude;  		// 3. ddmm.mmmm (double)
 	double  longitude; 		// 5. ddmm.mmmm (double)
 	double  speed;      	// 7. 0.13 knots (double)

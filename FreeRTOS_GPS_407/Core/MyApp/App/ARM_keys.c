@@ -95,11 +95,11 @@ void ARM_keys_task (void *argument)
 	    // tot slot, laat de gekleurde ledjes meedoen
 	    // maar niet blauw, want die is ingezet voor de timer
 	    // kijk naar de manier waarop de if-elses er uitzien
-		for (i=0; i<3; i++)
+		/*for (i=0; i<3; i++)
 		{
 			led = (i==0 ? LEDRED : (i==1 ? LEDORANGE : LEDGREEN));
 			toggle_led(led);
-	  	}
+	  	}*/
      	taskYIELD(); // done, force context switch
 	}
 }

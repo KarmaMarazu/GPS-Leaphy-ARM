@@ -29,20 +29,37 @@ Data_Parser waypoints[MAX_WAYPOINTS]; // struct waar in nuttige data in bruikbar
 void GNRMC_Parser(void* argument)
 {
 	int i = 0; // teller voor schrijven naar average array voor nauwkeurigere waypoint opslaan
+	char val1[10];
+	char val2[10];
 
 	while(TRUE)
 	{
 		xTaskNotifyWait(0,0, NULL, portMAX_DELAY);			// wacht op notify van fill_GNRMC in gps.c
-		if(!(gnrmc.status == 'A'))							// status check
-			continue;
 
 		xSemaphoreTake(hGNRMC_Struct_Sem, portMAX_DELAY); 	// wacht op toegang tot de mutex;
-		memset(&GNRMC_data, 0, sizeof(Data_Parser)); 		// clear the struct
 
-		GNRMC_data.latitude = atof(gnrmc.latitude);
-		GNRMC_data.longitude = atof(gnrmc.longitude);
-		GNRMC_data.speed = atof(gnrmc.speed);
-		GNRMC_data.course = atof(gnrmc.course);
+		if(!(gnrmc.status == 'A'))	// status check
+		{
+			GNRMC_data.status = 'V';
+			xSemaphoreGive(hGNRMC_Struct_Sem);
+			continue;
+		}
+
+		memset(&GNRMC_data, 0, sizeof(Data_Parser)); 		// clear the struct
+		memset(val1, 0, sizeof(val1));
+		memset(val2, 0, sizeof(val1));
+
+		memcpy(val1, gnrmc.latitude, 2);
+		memcpy(val2, gnrmc.latitude+2, 8);
+		GNRMC_data.latitude = (atof(val1))+(atof(val2)/60);
+		memset(val1, 0, sizeof(val1));
+		memset(val2, 0, sizeof(val1));
+		memcpy(val1, gnrmc.longitude, 3);
+		memcpy(val2, gnrmc.longitude+3, 8);
+		GNRMC_data.longitude = (atof(val1))+(atof(val2)/60);
+		GNRMC_data.speed = atof(gnrmc.speed)*0.514444;
+		GNRMC_data.course = atof(gnrmc.course)/100;
+		GNRMC_data.status = 'A';
 
 		average[i] = GNRMC_data;							// zet data round robin in average[].
 
@@ -80,6 +97,15 @@ void data_opslaanTask(void *argument)
 		if (i<MAX_WAYPOINTS)
 		{
 		    xSemaphoreTake(hGNRMC_Struct_Sem, portMAX_DELAY);			// wacht op toegang tot de mutex;
+
+		    if(!(GNRMC_data.status == 'A'))	// status check
+		    {
+		    	LCD_clear(); 											// LCD legen
+		    	LCD_putint(i); 											// waypoint nummer op LCD
+		    	LCD_put("/30 waypoints Geen Data");
+		    	xSemaphoreGive(hGNRMC_Struct_Sem);
+		    	continue;
+		    }
 
 			waypoints[i].latitude = (average[0].latitude + average[1].latitude + average[2].latitude)/3; 	//gemiddelde wordt berekend en opgeslagen
 			waypoints[i].longitude = (average[0].longitude + average[1].longitude + average[2].longitude)/3;
