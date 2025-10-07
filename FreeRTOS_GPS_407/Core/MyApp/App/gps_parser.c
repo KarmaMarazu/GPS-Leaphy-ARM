@@ -60,7 +60,7 @@ void GNRMC_Parser(void* argument)
 void data_opslaanTask(void *argument)
 {
 	uint32_t key;
-	int i = 1;
+	int i = 0;
 	while(TRUE)
 	{
 		xTaskNotifyWait (0x00, 0xffffffff, &key, portMAX_DELAY);
@@ -74,7 +74,7 @@ void data_opslaanTask(void *argument)
 		if (i<MAX_WAYPOINTS)
 		{
 		    LCD_clear(); //LCD legen
-		    LCD_putint(i); // waypoint nummer op LCD
+		    LCD_putint(i+1); // waypoint nummer op LCD
 		    LCD_put("/30 waypoints");
 		    osDelay(100);
 
