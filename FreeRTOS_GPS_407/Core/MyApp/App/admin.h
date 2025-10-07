@@ -36,7 +36,7 @@
 * The data field block, including delimiters is limited to 74 characters or less.
 */
 /// set max waypoints for gps_parser
-#define MAX_WAYPOINTS 31
+#define MAX_WAYPOINTS 30
 /// struct voor taak-gegevens, waaronder de argumenten om een taak aan te maken
 typedef struct TaskData
 {
