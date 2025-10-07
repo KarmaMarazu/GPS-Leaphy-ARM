@@ -33,13 +33,22 @@ void toggle_led (uint32_t color)
 * @param *argument Niet gebruikt, eventueel een waarde of string om te testen
 * @return void.
 */
+/**
+* @brief Deze task handelt de ARM-toets af, die ontvangen is van de ISR-handler (zie: stm32f4xx_it.c).
+* @param *argument Niet gebruikt, eventueel een waarde of string om te testen
+* @return void.
+*/
 void ARM_keys_IRQ (void *argument)
 {
 	unsigned int key;
+	unsigned int j = 0;
 	osThreadId_t hARM_keys;
 	osThreadId_t hData_opslaanTask;
+	TaskStatus_t    TaskDetails;
 
 	UART_puts("\r\n"); UART_puts((char *)__func__); UART_puts(" started");
+
+	vTaskSuspend(GetTaskhandle("drive_task"));					// stopt de drivetask
 
 	if (!(hARM_keys = GetTaskhandle("ARM_keys_task")))
 		error_HaltOS("Err:ARM_hndle");
@@ -48,11 +57,31 @@ void ARM_keys_IRQ (void *argument)
 
     while (1)
 	{
+
 		// wait for ISR (EXTI0_IRQHandler()) to signal that a key is pressed
 		key = xEventGroupWaitBits(hKEY_Event, 0xffff, pdTRUE, pdFALSE, portMAX_DELAY );
 
-		if ((key == 0x0001) || (key == 0x0002))
-			xTaskNotify(hData_opslaanTask, key, eSetValueWithOverwrite); // notify task2 with value
+		vTaskGetInfo(GetTaskhandle("data_opslaanTask"), &TaskDetails, pdFALSE, eInvalid);
+
+		if (((key == 0x0001) || (key == 0x0002)) && ((TaskDetails.eCurrentState) != eSuspended) )
+			xTaskNotify(hData_opslaanTask, key, eSetValueWithOverwrite); // notify Data_opslaanTask with value
+
+		if (key == 0x0004)
+		{
+			j++;
+
+			if(j%2 == 0)
+			{
+				vTaskResume(GetTaskhandle("data_opslaanTask"));				// start de waypoints opslaan task
+				vTaskSuspend(GetTaskhandle("drive_task"));					// stopt de drivetask
+			}
+			else if(j%2 == 1)
+			{
+				vTaskSuspend(GetTaskhandle("data_opslaanTask"));			// start de waypoints opslaan task
+				vTaskResume(GetTaskhandle("drive_task"));					// start de drivetask
+			}
+		}
+
 
 		xTaskNotify(hARM_keys, key, eSetValueWithOverwrite); // notify task2 with value
 	}
@@ -69,7 +98,7 @@ void ARM_keys_IRQ (void *argument)
 void ARM_keys_task (void *argument)
 {
 	uint32_t 	 key;
-	int			 i, led;
+	//int			 i, led;
 
 	while(TRUE)
 	{

@@ -131,3 +131,16 @@ void data_opslaanTask(void *argument)
 	}
 }
 
+
+
+
+void drive_task(void*)
+{
+
+	while(TRUE)
+	{
+		UART_puts("drive task aan\n\r");
+		osDelay(500);
+	}
+}
+
