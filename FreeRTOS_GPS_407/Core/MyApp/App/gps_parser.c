@@ -63,6 +63,8 @@ void GNRMC_Parser(void* argument)
 
 		average[i] = GNRMC_data;							// zet data round robin in average[].
 
+		Afstand_Course_Bepalen();
+
 		xSemaphoreGive(hGNRMC_Struct_Sem); 					// geef de mutex weer vrij voor een ander
 
 		i++;

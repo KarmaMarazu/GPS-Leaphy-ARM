@@ -132,6 +132,9 @@ extern void data_opslaanTask (void *);
 extern void GNRMC_Parser(void*);
 extern void drive_task(void*);
 
+// Positie_Bepaling.c
+extern void Afstand_Course_Bepalen(void);
+
 // student.c
 extern void Student_task1 (void *);
 
