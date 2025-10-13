@@ -97,6 +97,14 @@ void Error_Handler(void);
 #define LED_RCK_GPIO_Port GPIOB
 #define BOOT1_Pin GPIO_PIN_2
 #define BOOT1_GPIO_Port GPIOB
+#define Ard_Bit1_Pin GPIO_PIN_7
+#define Ard_Bit1_GPIO_Port GPIOE
+#define Ard_Bit2_Pin GPIO_PIN_8
+#define Ard_Bit2_GPIO_Port GPIOE
+#define Ard_Bit3_Pin GPIO_PIN_9
+#define Ard_Bit3_GPIO_Port GPIOE
+#define Ard_Bit4_Pin GPIO_PIN_10
+#define Ard_Bit4_GPIO_Port GPIOE
 #define CLK_IN_Pin GPIO_PIN_10
 #define CLK_IN_GPIO_Port GPIOB
 #define LD4_Pin GPIO_PIN_12

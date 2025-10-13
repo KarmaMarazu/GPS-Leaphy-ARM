@@ -13,7 +13,6 @@
 #include "cmsis_os.h"
 #include "gps.h"
 
-
 GNRMC gnrmc; // global struct for GNRMC-messages
 
 
@@ -23,38 +22,83 @@ GNRMC gnrmc; // global struct for GNRMC-messages
 * om gelijk met doubles te werken, die je dan met atof(); omzet.
 * @return void
 */
+
+void split_nmea_fields(char *message, char *fields[], int max_fields)
+{
+    int i = 0;
+    char *start = message;
+    while (i < max_fields)
+    {
+        fields[i++] = start;
+        char *comma = strchr(start, ',');
+        if (!comma)
+			break;
+        *comma = '\0';
+        start = comma + 1;
+    }
+}
+
 void fill_GNRMC(char *message)
 {
 	// example: $GNRMC,164435.000,A,5205.9505,N,00507.0873,E,0.49,21.70,140423,,,A
 	//          id    , time     ,s,
+
+	char *fields[20];
+	split_nmea_fields(message, fields, 20);
+
+	strcpy(gnrmc.head, fields[0]);
+	gnrmc.status = fields[2][0];
+	strcpy(gnrmc.latitude, fields[3]);
+	strcpy(gnrmc.longitude, fields[5]);
+	strcpy(gnrmc.speed, fields[7]);
+	strcpy(gnrmc.course, fields[8]);
+/*
 	char *tok = ",";
-	char *s;
 
-	memset(&gnrmc, 0, sizeof(GNRMC)); // clear the struct
+    char *s;
+    UART_puts("\r\nmessage = ");
+    UART_puts(message);
+    memset(&gnrmc, 0, sizeof(GNRMC)); // clear the struct
 
-	s = strtok(message, tok); // 0. header;
-	strcpy(gnrmc.head, s);
+    s = strsep(&message, tok); // 1. header;
 
-	s = strtok(NULL, tok);    // 1. time; not used
+    strcpy(gnrmc.head, s);
 
-	s = strtok(NULL, tok);    // 2. valid;
-	gnrmc.status = s[0];
+    s = strsep(&message, tok); // 1. header;
+    strcpy(gnrmc.time, s);
 
-	s = strtok(NULL, tok);    // 3. latitude;
-	strcpy(gnrmc.latitude, s);
+    s = strsep(&message, tok);    // 3. valid;
+    gnrmc.status = s[0];
 
-	s = strtok(NULL, tok);    // 4. N/S; not used
+    s = strsep(&message, tok);    // 4. latitude;
+    strcpy(gnrmc.latitude, s);
 
-	s = strtok(NULL, tok);    // 5. longitude;
-	strcpy(gnrmc.longitude, s);
+    s = strsep(&message, tok);    // 5. N/S; not used
+    gnrmc.NS_ind =s[0];
 
-	s = strtok(NULL, tok);    // 6. E/W; not used
+    s = strsep(&message, tok);    // 6. longitude;
+    strcpy(gnrmc.longitude, s);
 
-	s = strtok(NULL, tok);    // 7. speed;
-	strcpy(gnrmc.speed, s);
+    s = strsep(&message, tok);    // 7. E/W; not used
+    gnrmc.EW_ind =s[0];
 
-	s = strtok(NULL, tok);    // 8. course;
-	strcpy(gnrmc.course, s);
+    s = strsep(&message, tok);    // 8. speed;
+    strcpy(gnrmc.speed, s);
+
+    s = strsep(&message, tok);    // 9. course;
+    strcpy(gnrmc.course, s);
+
+    s = strsep(&message, tok);    // 10. date;
+    strcpy(gnrmc.date, s);
+
+    s = strsep(&message, tok);    // 11. mag_var
+    strcpy(gnrmc.mag_var, s);
+
+    s = strsep(&message, tok);    // 12. mag_var_pos
+    gnrmc.mag_var_pos = s[0];
+
+    s = strsep(&message, tok);    // 13. mode
+    gnrmc.mode = s[0];
 
 	if (Uart_debug_out & GPS_DEBUG_OUT)
 	{
@@ -64,12 +108,9 @@ void fill_GNRMC(char *message)
 		UART_puts("\r\n\t longitude:\t");  UART_puts(gnrmc.longitude);
 		UART_puts("\r\n\t speed:    \t");  UART_puts(gnrmc.speed);
 		UART_puts("\r\n\t course:   \t");  UART_puts(gnrmc.course);
-	}
+	}*/
 	xTaskNotify(GetTaskhandle("GNRMC_Parser"), 0, eNoAction);
-
 }
-
-
 
 /**
 * @brief Leest de GPS-NMEA-strings die via de UART via interrupt-handler (HAL_UART_RxCpltCallback)
@@ -155,6 +196,11 @@ void GPS_getNMEA (void *argument)
 				case eGNGGA: break;
 				default:     break;
 				}
+				/*
+				if (msg_type == eGNRMC)
+				{
+					UART_puts("\rHallo");
+				}*/
 			}
 
 			new_msg = FALSE; // new message possible

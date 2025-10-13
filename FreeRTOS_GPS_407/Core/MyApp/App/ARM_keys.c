@@ -72,13 +72,21 @@ void ARM_keys_IRQ (void *argument)
 
 			if(j%2 == 0)
 			{
+				xSemaphoreTake(hGNRMC_Struct_Sem, portMAX_DELAY);
 				vTaskResume(GetTaskhandle("data_opslaanTask"));				// start de waypoints opslaan task
 				vTaskSuspend(GetTaskhandle("drive_task"));					// stopt de drivetask
+				HAL_GPIO_WritePin(GPIOD, LEDRED, GPIO_PIN_SET);
+				HAL_GPIO_WritePin(GPIOD, LEDGREEN, GPIO_PIN_RESET);
+				xSemaphoreGive(hGNRMC_Struct_Sem);
 			}
 			else if(j%2 == 1)
 			{
+				xSemaphoreTake(hGNRMC_Struct_Sem, portMAX_DELAY);
 				vTaskSuspend(GetTaskhandle("data_opslaanTask"));			// start de waypoints opslaan task
 				vTaskResume(GetTaskhandle("drive_task"));					// start de drivetask
+				HAL_GPIO_WritePin(GPIOD, LEDRED, GPIO_PIN_RESET);
+				HAL_GPIO_WritePin(GPIOD, LEDGREEN, GPIO_PIN_SET);
+				xSemaphoreGive(hGNRMC_Struct_Sem);
 			}
 		}
 
@@ -111,7 +119,7 @@ void ARM_keys_task (void *argument)
 	    xSemaphoreTake(hLED_Sem, portMAX_DELAY); // krijg toegang (mutex) tot leds
 
     	LED_put((unsigned char)key); // set 8 leds-byte to key-value
-	    BUZZER_put (500);
+	    //BUZZER_put (500);
 		osDelay(500);
 
 		if (Uart_debug_out & ARMKEYS_DEBUG_OUT)

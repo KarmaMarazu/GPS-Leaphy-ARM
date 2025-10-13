@@ -47,23 +47,21 @@ void GNRMC_Parser(void* argument)
 
 		memset(&GNRMC_data, 0, sizeof(Data_Parser)); 		// clear the struct
 		memset(val1, 0, sizeof(val1));
-		memset(val2, 0, sizeof(val1));
+		memset(val2, 0, sizeof(val2));
 
 		memcpy(val1, gnrmc.latitude, 2);
 		memcpy(val2, gnrmc.latitude+2, 8);
 		GNRMC_data.latitude = (atof(val1))+(atof(val2)/60);
 		memset(val1, 0, sizeof(val1));
-		memset(val2, 0, sizeof(val1));
+		memset(val2, 0, sizeof(val2));
 		memcpy(val1, gnrmc.longitude, 3);
 		memcpy(val2, gnrmc.longitude+3, 8);
 		GNRMC_data.longitude = (atof(val1))+(atof(val2)/60);
 		GNRMC_data.speed = atof(gnrmc.speed)*0.514444;
-		GNRMC_data.course = atof(gnrmc.course)/100;
+		GNRMC_data.course = atof(gnrmc.course);
 		GNRMC_data.status = 'A';
 
 		average[i] = GNRMC_data;							// zet data round robin in average[].
-
-		Afstand_Course_Bepalen();
 
 		xSemaphoreGive(hGNRMC_Struct_Sem); 					// geef de mutex weer vrij voor een ander
 
@@ -96,7 +94,7 @@ void data_opslaanTask(void *argument)
 			continue;													// begin boven aan en wacht weer op een arm-key
 		}
 
-		if (i<MAX_WAYPOINTS)
+		if (i<MAX_WAYPOINTS && key == 0x0001)
 		{
 		    xSemaphoreTake(hGNRMC_Struct_Sem, portMAX_DELAY);			// wacht op toegang tot de mutex;
 
@@ -108,12 +106,7 @@ void data_opslaanTask(void *argument)
 		    	xSemaphoreGive(hGNRMC_Struct_Sem);
 		    	continue;
 		    }
-
-			waypoints[i].latitude = (average[0].latitude + average[1].latitude + average[2].latitude)/3; 	//gemiddelde wordt berekend en opgeslagen
-			waypoints[i].longitude = (average[0].longitude + average[1].longitude + average[2].longitude)/3;
-			waypoints[i].speed = (average[0].speed + average[1].speed + average[2].speed)/3;
-			waypoints[i].course = (average[0].course + average[1].course + average[2].course)/3;
-
+		    Average_Bepalen_Waypoints(i);
 		    xSemaphoreGive(hGNRMC_Struct_Sem); 							// wacht op toegang tot de mutex;
 
 			i++;
@@ -122,9 +115,8 @@ void data_opslaanTask(void *argument)
 		    LCD_putint(i); 												// waypoint nummer op LCD
 		    LCD_put("/30 waypoints");
 		    osDelay(100);												// spam beveiliging
-
-
-		} else if (i == MAX_WAYPOINTS)									// het maximaal aantal waypoints is bereikt
+		}
+		else if (i == MAX_WAYPOINTS)									// het maximaal aantal waypoints is bereikt
 		{
 			 LCD_put("Limit reached!");
 			 osDelay(100);												// zonder dit loopt de lcd vast
@@ -133,16 +125,10 @@ void data_opslaanTask(void *argument)
 	}
 }
 
-
-
-
-void drive_task(void*)
+void Average_Bepalen_Waypoints(int i)
 {
-
-	while(TRUE)
-	{
-		UART_puts("drive task aan\n\r");
-		osDelay(500);
-	}
+	waypoints[i].latitude = (average[0].latitude + average[1].latitude + average[2].latitude)/3; 	//gemiddelde wordt berekend en opgeslagen
+	waypoints[i].longitude = (average[0].longitude + average[1].longitude + average[2].longitude)/3;
+	waypoints[i].speed = (average[0].speed + average[1].speed + average[2].speed)/3;
+	//waypoints[i].course = (average[0].course + average[1].course + average[2].course)/3;
 }
-

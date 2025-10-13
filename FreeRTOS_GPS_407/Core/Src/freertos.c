@@ -52,6 +52,7 @@
 void configureTimerForRunTimeStats(void);
 unsigned long getRunTimeCounterValue(void);
 /* USER CODE END FunctionPrototypes */
+
 /* Private application code --------------------------------------------------*/
 /* USER CODE BEGIN Application */
 __weak void configureTimerForRunTimeStats(void)
@@ -66,3 +67,4 @@ __weak unsigned long getRunTimeCounterValue(void)
     return DWT->CYCCNT;
 }
 /* USER CODE END Application */
+

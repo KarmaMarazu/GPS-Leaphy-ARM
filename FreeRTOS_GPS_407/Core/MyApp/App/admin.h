@@ -62,7 +62,6 @@ extern EventGroupHandle_t hKEY_Event;
 /// handle voor software timer
 extern TimerHandle_t      hTimer1;
 
-
 /// debug naar uart output, zie uart_keys.c
 /// bitmask-toggle key voor task-debug-output
 extern int Uart_debug_out;
@@ -88,9 +87,9 @@ extern int Uart_debug_out;
 /// LD4_Pin
 #define LEDGREEN  GPIO_PIN_12
 /// LD3_Pin
-#define LEDRED    GPIO_PIN_13
+#define LEDORANGE    GPIO_PIN_13
 /// LD5_Pin
-#define LEDORANGE GPIO_PIN_14
+#define LEDRED GPIO_PIN_14
 /// LD6_Pin
 #define LEDBLUE   GPIO_PIN_15
 
@@ -130,10 +129,9 @@ extern void GPS_getNMEA (void *);
 // gps_parser.c
 extern void data_opslaanTask (void *);
 extern void GNRMC_Parser(void*);
-extern void drive_task(void*);
 
-// Positie_Bepaling.c
-extern void Afstand_Course_Bepalen(void);
+// Positie_bepaling.c
+extern void drive_task(void*);
 
 // student.c
 extern void Student_task1 (void *);
