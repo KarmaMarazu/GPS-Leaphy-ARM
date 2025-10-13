@@ -138,3 +138,7 @@ extern void Student_task1 (void *);
 
 // timer.c
 extern void Timer1_Handler(void);
+
+// HC-SR04.c
+
+extern int GetDistance(void);

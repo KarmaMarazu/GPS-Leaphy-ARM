@@ -57,7 +57,7 @@ void Afstand_Course_Bepalen(void)
 	UART_puts("\rHuidige Course = "); UART_putint((int)GNRMC_data.course);
 }
 
-char Leaphy_Actie_Bepalen(void)
+char Leaphy_Actie_Bepalen(int)
 {
 	if(!(GNRMC_data.course))
 		return 0x0F;
@@ -121,11 +121,6 @@ void Leaphy_Data_Sturen(char data)
 	default:	UART_puts("\rError kan geen keuze maken");
 				break;
 	}
-	/*
-	UART_puts("\rdata = "); UART_putint(data);
-	data++;
-	if (data > 15)
-		data = 0;*/
 }
 
 void Average_Bepalen_Drive(void)
@@ -144,7 +139,8 @@ void drive_task(void*)
 	{
 		Average_Bepalen_Drive();
 		Afstand_Course_Bepalen();
-		char Data = Leaphy_Actie_Bepalen();
+		UART_puts("\rAfstand = "); UART_putint((int)GetDistance());
+		char Data = Leaphy_Actie_Bepalen(1);
 		Leaphy_Data_Sturen(Data);
 		osDelay(200);
 	}
