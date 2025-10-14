@@ -1,19 +1,15 @@
 /**
 * @file my_gps.h
-* @brief Bevat basic (provisorische) defines & externals voor de gps routines
+* @brief Bevat basic defines & externals voor de gps routines
 * @attention
-* <h3>&copy; Copyright (c) 2023 (HU) Michiel Scager.</h3>
-* @author MSC
+* <h3>&copy; Copyright (c) 2023 (HU)
+* @author MSC, Twan Ton, Mika Dahlkamp, Jasper Verduin en Thomas van Ooijen
 *
 * @date 5/9/2023
 */
 int hex2int(char *c);
 int hexchar2int(char c);
 int checksum_valid(char *string);
-
-//extern void GNRMC_Parser(void);
-
-
 
 /// GNRMC struct: all with char-members - should/could be improved with proper data-elements
 typedef struct _GNRMC
@@ -44,6 +40,12 @@ typedef struct _Data_Parser
 	double  course;   	// 8. 309.62 degrees (double)
 } Data_Parser;
 
+// Struct voor het bijelkaar houden van de vector tussen Leaphy en Waypoint
+typedef struct Vector
+{
+	double lengte;
+	double course;
+} Vector;
 
 // enum voor NMEA protocolstrings (starting 'e' for enum)
 enum NMEA
@@ -52,3 +54,14 @@ enum NMEA
 	eGPGSA,
 	eGNGGA
 };
+
+/// struct waar gps string in wordt opgeslagen
+extern GNRMC gnrmc;
+/// struct om de string om te zetten naar cijfers.
+extern Data_Parser GNRMC_data;
+/// struct om huidige positie in op te slaan
+extern Data_Parser Gem;
+/// array van structs om de waypoints van de route in op te slaan
+extern Data_Parser waypoints[MAX_WAYPOINTS];
+/// array van structs om hiervan een 1 gemiddelde waarde te maken
+extern Data_Parser average[3];

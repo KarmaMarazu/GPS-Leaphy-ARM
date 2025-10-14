@@ -4,10 +4,11 @@
 * <b>Demonstreert: xEventGroupWaitBits(), xTaskGetHandle(), xTaskNotify(), xTaskNotifyWait(),xSemaphoregive(), xSemaphoreTake(). </b><br>
 *
 * Aan de ARM-keys is een interrupt gekoppeld (zie stm32f4xx_it.c). Die stuurt een event
-* door die opgevangen wordt door task ARM_keys_IRQ().
-* @author MSC
+* door die opgevangen wordt door task ARM_keys_IRQ().<BR><BR>
+* In ARM_keys_IRQ wordt er aan de hand van welke key, bepaald wat er gebeurd moet worden. waypoint set, reset, wissel modus
+* @author  MSC, Twan Ton, Mika Dahlkamp, Jasper Verduin en Thomas van Ooijen
 *
-* @date 5/5/2022
+* @date 10/10/2025
 */
 
 #include <admin.h>
@@ -29,26 +30,25 @@ void toggle_led (uint32_t color)
 
 
 /**
-* @brief Deze task handelt de ARM-toets af, die ontvangen is van de ISR-handler (zie: stm32f4xx_it.c).
+* @brief Deze task handelt de ARM-toets af, die ontvangen is van de ISR-handler (zie: stm32f4xx_it.c). <BR>
+* Hier wordt gewisseld tussen drive mode en oplaan mode. Dit wordt via een notify doorgestuurd naar bijbehorende task.
 * @param *argument Niet gebruikt, eventueel een waarde of string om te testen
 * @return void.
 */
-/**
-* @brief Deze task handelt de ARM-toets af, die ontvangen is van de ISR-handler (zie: stm32f4xx_it.c).
-* @param *argument Niet gebruikt, eventueel een waarde of string om te testen
-* @return void.
-*/
+
 void ARM_keys_IRQ (void *argument)
 {
-	unsigned int key;
-	unsigned int j = 0;
-	osThreadId_t hARM_keys;
-	osThreadId_t hData_opslaanTask;
+	unsigned int 	key;
+	unsigned int 	j = 0;
+	TickType_t		start = 0;
+	TickType_t		stop;
+	osThreadId_t 	hARM_keys;
+	osThreadId_t 	hData_opslaanTask;
 	TaskStatus_t    TaskDetails;
 
 	UART_puts("\r\n"); UART_puts((char *)__func__); UART_puts(" started");
 
-	vTaskSuspend(GetTaskhandle("drive_task"));					// stopt de drivetask
+	vTaskSuspend(GetTaskhandle("drive_task"));					// stopt de drivetask bij opstart
 
 	if (!(hARM_keys = GetTaskhandle("ARM_keys_task")))
 		error_HaltOS("Err:ARM_hndle");
@@ -63,8 +63,8 @@ void ARM_keys_IRQ (void *argument)
 
 		vTaskGetInfo(GetTaskhandle("data_opslaanTask"), &TaskDetails, pdFALSE, eInvalid);
 
-		if (((key == 0x0001) || (key == 0x0002)) && ((TaskDetails.eCurrentState) != eSuspended) )
-			xTaskNotify(hData_opslaanTask, key, eSetValueWithOverwrite); // notify Data_opslaanTask with value
+		if (((key == 0x0001) || (key == 0x0002)) && ((TaskDetails.eCurrentState) != eSuspended) )// verzend alleen als task niet suspended is.
+			xTaskNotify(hData_opslaanTask, key, eSetValueWithOverwrite); 	// notify Data_opslaanTask with value
 
 		if (key == 0x0004)
 		{
@@ -72,21 +72,27 @@ void ARM_keys_IRQ (void *argument)
 
 			if(j%2 == 0)
 			{
-				xSemaphoreTake(hGNRMC_Struct_Sem, portMAX_DELAY);
+				xSemaphoreTake(hGNRMC_Struct_Sem, portMAX_DELAY);			// wacht totdat de task klaar is met de mutex
 				vTaskResume(GetTaskhandle("data_opslaanTask"));				// start de waypoints opslaan task
 				vTaskSuspend(GetTaskhandle("drive_task"));					// stopt de drivetask
-				HAL_GPIO_WritePin(GPIOD, LEDRED, GPIO_PIN_SET);
-				HAL_GPIO_WritePin(GPIOD, LEDGREEN, GPIO_PIN_RESET);
+				HAL_GPIO_WritePin(GPIOD, LEDRED, GPIO_PIN_SET);				// rode led is route opslaan
+				HAL_GPIO_WritePin(GPIOD, LEDGREEN, GPIO_PIN_RESET);			// groene led is drive mode
 				xSemaphoreGive(hGNRMC_Struct_Sem);
+
+				stop = xTaskGetTickCount() - start;							// slaat de vertreken tijd op sinds drive_task is gestart. max 4294967 sec
+				UART_puts("\rtijds sinds start drive mode: ");	UART_putint(stop/1000); 	UART_puts(" seconden");
+
 			}
 			else if(j%2 == 1)
 			{
-				xSemaphoreTake(hGNRMC_Struct_Sem, portMAX_DELAY);
+				xSemaphoreTake(hGNRMC_Struct_Sem, portMAX_DELAY);			// wacht totdat de task klaar is met de mutex
 				vTaskSuspend(GetTaskhandle("data_opslaanTask"));			// start de waypoints opslaan task
 				vTaskResume(GetTaskhandle("drive_task"));					// start de drivetask
-				HAL_GPIO_WritePin(GPIOD, LEDRED, GPIO_PIN_RESET);
-				HAL_GPIO_WritePin(GPIOD, LEDGREEN, GPIO_PIN_SET);
+				HAL_GPIO_WritePin(GPIOD, LEDRED, GPIO_PIN_RESET);			// rode led is route opslaan
+				HAL_GPIO_WritePin(GPIOD, LEDGREEN, GPIO_PIN_SET);			// groene led is drive mode
 				xSemaphoreGive(hGNRMC_Struct_Sem);
+
+				start = xTaskGetTickCount();								// als de drive_task wordt gestart wordt de begintijd opgeslagen
 			}
 		}
 
@@ -119,7 +125,6 @@ void ARM_keys_task (void *argument)
 	    xSemaphoreTake(hLED_Sem, portMAX_DELAY); // krijg toegang (mutex) tot leds
 
     	LED_put((unsigned char)key); // set 8 leds-byte to key-value
-	    //BUZZER_put (500);
 		osDelay(500);
 
 		if (Uart_debug_out & ARMKEYS_DEBUG_OUT)
@@ -129,14 +134,6 @@ void ARM_keys_task (void *argument)
 
 	    xSemaphoreGive(hLED_Sem); // geef toegang (mutex) vrij
 
-	    // tot slot, laat de gekleurde ledjes meedoen
-	    // maar niet blauw, want die is ingezet voor de timer
-	    // kijk naar de manier waarop de if-elses er uitzien
-		/*for (i=0; i<3; i++)
-		{
-			led = (i==0 ? LEDRED : (i==1 ? LEDORANGE : LEDGREEN));
-			toggle_led(led);
-	  	}*/
      	taskYIELD(); // done, force context switch
 	}
 }
