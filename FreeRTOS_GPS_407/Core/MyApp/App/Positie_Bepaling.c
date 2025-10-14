@@ -1,3 +1,15 @@
+/**
+* @file Positie_bepaling.c
+* @brief Deze file bevat de functies en de task drive_task. <BR>
+* De leaphy moet zich richting de waypoint bewegen op basis van zijn huidige positie in richting.<BR>
+* Dit wordt gedaan door een vector op te stellen van de huidige richting van de leaphy en deze te vergelijken met de vector naar de waypoint.
+* @author Twan Ton, Mika Dahlkamp, Thomas van Ooijen en Jasper Verduin
+*
+* @date 1/10/2025.
+*/
+
+
+
 #include <admin.h>
 #include "main.h"
 #include "cmsis_os.h"
@@ -48,7 +60,7 @@ void Afstand_Course_Bepalen(void)
 
 
 /**
-* @brief functie om te bepalen wat de actie van de leaphy moet zijn op basis van de eerder berekende course naar de waypoint en de huidige course.
+* @brief Functie om te bepalen wat de actie van de leaphy moet zijn op basis van de eerder berekende course naar de waypoint en de huidige course.
 * @param int afstand gelezen door de sensor
 * @return void
 */
@@ -84,7 +96,7 @@ char Leaphy_Actie_Bepalen(int)
 }
 
 /**
-* @brief functie om de pins aan te sturen die de arduino op de leaphy kan uitlezen.
+* @brief Functie om de pins aan te sturen die de arduino op de leaphy kan uitlezen.
 * @param char data die naar de arduino gestuurd moet worden.
 * @return void
 */
@@ -129,7 +141,7 @@ void Leaphy_Data_Sturen(char data)
 }
 
 /**
-* @brief functie om gemiddelde van 3 datapunten op de slaan voor nauwkeurigere locatie.
+* @brief Functie om gemiddelde van 3 datapunten op de slaan voor nauwkeurigere locatie.
 * @return void
 */
 void Average_Bepalen_Drive(void)

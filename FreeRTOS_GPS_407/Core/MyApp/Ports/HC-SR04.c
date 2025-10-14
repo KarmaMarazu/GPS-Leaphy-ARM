@@ -20,8 +20,7 @@ uint16_t distance = 0;
 
 /**
 * @brief Lees de afstand van sensor tot voorwerp.
-* @param void.
-* @return int distance.
+* @return int distance
 */
 int GetDistance(void)
 {

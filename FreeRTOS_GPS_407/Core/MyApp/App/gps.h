@@ -40,7 +40,7 @@ typedef struct _Data_Parser
 	double  course;   	// 8. 309.62 degrees (double)
 } Data_Parser;
 
-// Struct voor het bijelkaar houden van de vector tussen Leaphy en Waypoint
+/// Struct voor het bij elkaar houden van de vector tussen Leaphy en Waypoint
 typedef struct Vector
 {
 	double lengte;

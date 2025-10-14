@@ -86,17 +86,6 @@ TASKDATA tasks[] =
 { GNRMC_Parser, NULL, .attr.name = "GNRMC_Parser", .attr.stack_size = 800, .attr.priority = osPriorityNormal1},
 { drive_task, NULL, . attr.name = "drive_task", .attr.stack_size = 600, .attr.priority = osPriorityNormal2},
 
-  // student.c
-{ Student_task1,NULL, .attr.name = "Student_task1",.attr.stack_size = 600, .attr.priority = osPriorityBelowNormal7 },
-
-  // ledjes.c
-  // NOTE: ledtasks 1 & 2 moeten dezelfde priority hebben, anders 'sterft' de taak met de laagste priority
-  //       wat wel kan: afdwingen dat taken aan de beurt komen door notifications, zie ledasks 3 & 4
-{ LED_Task1,    NULL, .attr.name = "LED_Task1",    .attr.stack_size = 450, .attr.priority = osPriorityBelowNormal4 },
-{ LED_Task2,    NULL, .attr.name = "LED_Task2",    .attr.stack_size = 450, .attr.priority = osPriorityBelowNormal4 },
-{ LED_Task3,    NULL, .attr.name = "LED_Task3",    .attr.stack_size = 450, .attr.priority = osPriorityBelowNormal5 },
-{ LED_Task4,    NULL, .attr.name = "LED_Task4",    .attr.stack_size = 450, .attr.priority = osPriorityBelowNormal4 },
-
   // deze laatste niet wissen, wordt gebruik als 'terminator' in for-loops
 { NULL,         NULL, .attr.name = NULL,           .attr.stack_size = 0,       .attr.priority = 0 }
 };

@@ -108,12 +108,6 @@ extern void         StartStopTask   (int);
 // handles.c
 extern void         CreateHandles   (void);
 
-// LEDS.c
-extern void LED_Task1   (void *);
-extern void LED_Task2   (void *);
-extern void LED_Task3   (void *);
-extern void LED_Task4   (void *);
-
 // ARM_keys.c
 extern void ARM_keys_IRQ (void *);
 extern void ARM_keys_task(void *);
@@ -132,9 +126,6 @@ extern void GNRMC_Parser(void*);
 
 // Positie_bepaling.c
 extern void drive_task(void*);
-
-// student.c
-extern void Student_task1 (void *);
 
 // timer.c
 extern void Timer1_Handler(void);

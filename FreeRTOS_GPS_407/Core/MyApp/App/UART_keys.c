@@ -18,7 +18,7 @@
 #include "cmsis_os.h"
 #include "uart.h"
 
-extern unsigned int os_delay; /// deze waarde kan hier veranderd worden.
+//extern unsigned int os_delay; /// deze waarde kan hier veranderd worden.
 
 /**
 * @brief Polt en leest characters in die de gebruiker via Terminalprogramma intikt.
@@ -186,13 +186,13 @@ void UART_menu (void *argument)
 		  	  	  UART_puts("\r\nGPS output = ");
 		  	  	  UART_puts(Uart_debug_out & GPS_DEBUG_OUT ? "ON\r\n" : "OFF\r\n");
 				  break;
-
-		/// ... en reageert ook op een paar letters
-		case 'D': /// D: Verandert de Default OSTIME-DELAY, die gebruikt wordt bij de LEDs.
-				  /// commando: <b>"d,200"</b> betekent: set delay op 200, NB: spaties worden niet afgevangen...
-				  os_delay = atoi(s+2); // skip first 2 characters
-				  UART_puts("\r\n os_delay set to: "); UART_putint(os_delay);
-				  break;
+//
+//		/// ... en reageert ook op een paar letters
+//		case 'D': /// D: Verandert de Default OSTIME-DELAY, die gebruikt wordt bij de LEDs.
+//				  /// commando: <b>"d,200"</b> betekent: set delay op 200, NB: spaties worden niet afgevangen...
+//				  os_delay = atoi(s+2); // skip first 2 characters
+//				  UART_puts("\r\n os_delay set to: "); UART_putint(os_delay);
+//				  break;
 
 		case 'M': DisplayMenu(); /// M: Displays het menu (zie my_app.c)
 				  break;
