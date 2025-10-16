@@ -18,6 +18,7 @@ Data_Parser GNRMC_data;
 Data_Parser Gem;					  // struct om huidige positie in op te slaan maar dan als gemiddelde van 3 punten
 Data_Parser average[3];				  // struct om een gemiddelde van de opgeslagen data te nemen als waypoint.
 Data_Parser waypoints[MAX_WAYPOINTS]; // struct waar in nuttige data in bruikbare cijfers wordt gezet.
+Data_Log Log;
 
 /**
 * @brief functie om gemiddelde van 3 datapunten op de slaan voor nauwkeurigere locatie.

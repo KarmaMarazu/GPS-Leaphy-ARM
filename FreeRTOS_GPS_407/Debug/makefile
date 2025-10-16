@@ -44,34 +44,34 @@ $(wildcard ../makefile.init) \
 $(wildcard ../makefile.targets) \
 
 
-BUILD_ARTIFACT_NAME := FreeRTOS_GPS_407
+BUILD_ARTIFACT_NAME := FreeRTOS_GPS_407_OUD
 BUILD_ARTIFACT_EXTENSION := elf
 BUILD_ARTIFACT_PREFIX :=
 BUILD_ARTIFACT := $(BUILD_ARTIFACT_PREFIX)$(BUILD_ARTIFACT_NAME)$(if $(BUILD_ARTIFACT_EXTENSION),.$(BUILD_ARTIFACT_EXTENSION),)
 
 # Add inputs and outputs from these tool invocations to the build variables 
 EXECUTABLES += \
-FreeRTOS_GPS_407.elf \
+FreeRTOS_GPS_407_OUD.elf \
 
 MAP_FILES += \
-FreeRTOS_GPS_407.map \
+FreeRTOS_GPS_407_OUD.map \
 
 SIZE_OUTPUT += \
 default.size.stdout \
 
 OBJDUMP_LIST += \
-FreeRTOS_GPS_407.list \
+FreeRTOS_GPS_407_OUD.list \
 
 
 # All Target
 all: main-build
 
 # Main-build Target
-main-build: FreeRTOS_GPS_407.elf secondary-outputs
+main-build: FreeRTOS_GPS_407_OUD.elf secondary-outputs
 
 # Tool invocations
-FreeRTOS_GPS_407.elf FreeRTOS_GPS_407.map: $(OBJS) $(USER_OBJS) D:\Documenten\Twan\Hogeschool\ EE\jaar\ 2\ Periode\ A\Technisch\GPS-Leaphy-ARM\FreeRTOS_GPS_407\STM32F407VGTX_FLASH.ld makefile objects.list $(OPTIONAL_TOOL_DEPS)
-	arm-none-eabi-gcc -o "FreeRTOS_GPS_407.elf" @"objects.list" $(USER_OBJS) $(LIBS) -mcpu=cortex-m4 -T"D:\Documenten\Twan\Hogeschool EE\jaar 2 Periode A\Technisch\GPS-Leaphy-ARM\FreeRTOS_GPS_407\STM32F407VGTX_FLASH.ld" --specs=nosys.specs -Wl,-Map="FreeRTOS_GPS_407.map" -Wl,--gc-sections -static --specs=nano.specs -mfpu=fpv4-sp-d16 -mfloat-abi=hard -mthumb -u _printf_float -Wl,--start-group -lc -lm -Wl,--end-group
+FreeRTOS_GPS_407_OUD.elf FreeRTOS_GPS_407_OUD.map: $(OBJS) $(USER_OBJS) C:\Users\HP\git\GPS-Leaphy-ARM\FreeRTOS_GPS_407\STM32F407VGTX_FLASH.ld makefile objects.list $(OPTIONAL_TOOL_DEPS)
+	arm-none-eabi-gcc -o "FreeRTOS_GPS_407_OUD.elf" @"objects.list" $(USER_OBJS) $(LIBS) -mcpu=cortex-m4 -T"C:\Users\HP\git\GPS-Leaphy-ARM\FreeRTOS_GPS_407\STM32F407VGTX_FLASH.ld" --specs=nosys.specs -Wl,-Map="FreeRTOS_GPS_407_OUD.map" -Wl,--gc-sections -static --specs=nano.specs -mfpu=fpv4-sp-d16 -mfloat-abi=hard -mthumb -u _printf_float -Wl,--start-group -lc -lm -Wl,--end-group
 	@echo 'Finished building target: $@'
 	@echo ' '
 
@@ -80,14 +80,14 @@ default.size.stdout: $(EXECUTABLES) makefile objects.list $(OPTIONAL_TOOL_DEPS)
 	@echo 'Finished building: $@'
 	@echo ' '
 
-FreeRTOS_GPS_407.list: $(EXECUTABLES) makefile objects.list $(OPTIONAL_TOOL_DEPS)
-	arm-none-eabi-objdump -h -S $(EXECUTABLES) > "FreeRTOS_GPS_407.list"
+FreeRTOS_GPS_407_OUD.list: $(EXECUTABLES) makefile objects.list $(OPTIONAL_TOOL_DEPS)
+	arm-none-eabi-objdump -h -S $(EXECUTABLES) > "FreeRTOS_GPS_407_OUD.list"
 	@echo 'Finished building: $@'
 	@echo ' '
 
 # Other Targets
 clean:
-	-$(RM) FreeRTOS_GPS_407.elf FreeRTOS_GPS_407.list FreeRTOS_GPS_407.map default.size.stdout
+	-$(RM) FreeRTOS_GPS_407_OUD.elf FreeRTOS_GPS_407_OUD.list FreeRTOS_GPS_407_OUD.map default.size.stdout
 	-@echo ' '
 
 secondary-outputs: $(SIZE_OUTPUT) $(OBJDUMP_LIST)

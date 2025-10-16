@@ -1,4 +1,4 @@
-Core/MyApp/App/ledjes.o: ../Core/MyApp/App/ledjes.c \
+Core/MyApp/Ports/HC-SR04.o: ../Core/MyApp/Ports/HC-SR04.c \
  ../Core/MyApp/App/admin.h \
  ../Middlewares/Third_Party/FreeRTOS/Source/include/FreeRTOS.h \
  ../Core/Inc/FreeRTOSConfig.h \

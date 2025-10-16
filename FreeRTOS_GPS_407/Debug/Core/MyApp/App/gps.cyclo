@@ -1,5 +1,6 @@
-../Core/MyApp/App/gps.c:26:6:fill_GNRMC	2
-../Core/MyApp/App/gps.c:80:6:GPS_getNMEA	16
-../Core/MyApp/App/gps.c:169:5:hex2int	1
-../Core/MyApp/App/gps.c:181:5:hexchar2int	7
-../Core/MyApp/App/gps.c:194:5:checksum_valid	4
+../Core/MyApp/App/gps.c:23:6:split_nmea_fields	3
+../Core/MyApp/App/gps.c:44:6:fill_GNRMC	2
+../Core/MyApp/App/gps.c:78:6:GPS_getNMEA	16
+../Core/MyApp/App/gps.c:167:5:hex2int	1
+../Core/MyApp/App/gps.c:179:5:hexchar2int	7
+../Core/MyApp/App/gps.c:192:5:checksum_valid	4

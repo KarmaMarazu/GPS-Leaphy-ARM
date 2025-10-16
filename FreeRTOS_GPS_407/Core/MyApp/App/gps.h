@@ -10,6 +10,7 @@
 int hex2int(char *c);
 int hexchar2int(char c);
 int checksum_valid(char *string);
+extern int k;
 
 /// GNRMC struct: all with char-members - should/could be improved with proper data-elements
 typedef struct _GNRMC
@@ -47,6 +48,17 @@ typedef struct Vector
 	double course;
 } Vector;
 
+// Struct voor de data log deze kan uitgelezen worden door de debug poort aantesluiten op je laptop
+// en de terminal te openen zodra het juiste knopje is ingedrukt wordt deze struct geprint
+typedef struct _DataLog
+{
+	int VerstrekenTijd;
+	char ErrorLog [200][200];
+	Data_Parser Route [200];
+	char LeaphyActie[200];
+} Data_Log;
+
+
 // enum voor NMEA protocolstrings (starting 'e' for enum)
 enum NMEA
 {
@@ -65,3 +77,5 @@ extern Data_Parser Gem;
 extern Data_Parser waypoints[MAX_WAYPOINTS];
 /// array van structs om hiervan een 1 gemiddelde waarde te maken
 extern Data_Parser average[3];
+
+extern Data_Log Log;

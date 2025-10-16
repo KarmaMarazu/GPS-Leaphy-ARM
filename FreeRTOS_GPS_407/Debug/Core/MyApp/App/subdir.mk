@@ -6,33 +6,27 @@
 # Add inputs and outputs from these tool invocations to the build variables 
 C_SRCS += \
 ../Core/MyApp/App/ARM_keys.c \
-../Core/MyApp/App/TIMER_opracht.c \
+../Core/MyApp/App/Positie_Bepaling.c \
 ../Core/MyApp/App/UART_keys.c \
 ../Core/MyApp/App/admin.c \
 ../Core/MyApp/App/gps.c \
-../Core/MyApp/App/gps_parser.c \
-../Core/MyApp/App/ledjes.c \
-../Core/MyApp/App/student.c 
+../Core/MyApp/App/gps_parser.c 
 
 OBJS += \
 ./Core/MyApp/App/ARM_keys.o \
-./Core/MyApp/App/TIMER_opracht.o \
+./Core/MyApp/App/Positie_Bepaling.o \
 ./Core/MyApp/App/UART_keys.o \
 ./Core/MyApp/App/admin.o \
 ./Core/MyApp/App/gps.o \
-./Core/MyApp/App/gps_parser.o \
-./Core/MyApp/App/ledjes.o \
-./Core/MyApp/App/student.o 
+./Core/MyApp/App/gps_parser.o 
 
 C_DEPS += \
 ./Core/MyApp/App/ARM_keys.d \
-./Core/MyApp/App/TIMER_opracht.d \
+./Core/MyApp/App/Positie_Bepaling.d \
 ./Core/MyApp/App/UART_keys.d \
 ./Core/MyApp/App/admin.d \
 ./Core/MyApp/App/gps.d \
-./Core/MyApp/App/gps_parser.d \
-./Core/MyApp/App/ledjes.d \
-./Core/MyApp/App/student.d 
+./Core/MyApp/App/gps_parser.d 
 
 
 # Each subdirectory must supply rules for building sources it contributes
@@ -42,7 +36,7 @@ Core/MyApp/App/%.o Core/MyApp/App/%.su Core/MyApp/App/%.cyclo: ../Core/MyApp/App
 clean: clean-Core-2f-MyApp-2f-App
 
 clean-Core-2f-MyApp-2f-App:
-	-$(RM) ./Core/MyApp/App/ARM_keys.cyclo ./Core/MyApp/App/ARM_keys.d ./Core/MyApp/App/ARM_keys.o ./Core/MyApp/App/ARM_keys.su ./Core/MyApp/App/TIMER_opracht.cyclo ./Core/MyApp/App/TIMER_opracht.d ./Core/MyApp/App/TIMER_opracht.o ./Core/MyApp/App/TIMER_opracht.su ./Core/MyApp/App/UART_keys.cyclo ./Core/MyApp/App/UART_keys.d ./Core/MyApp/App/UART_keys.o ./Core/MyApp/App/UART_keys.su ./Core/MyApp/App/admin.cyclo ./Core/MyApp/App/admin.d ./Core/MyApp/App/admin.o ./Core/MyApp/App/admin.su ./Core/MyApp/App/gps.cyclo ./Core/MyApp/App/gps.d ./Core/MyApp/App/gps.o ./Core/MyApp/App/gps.su ./Core/MyApp/App/gps_parser.cyclo ./Core/MyApp/App/gps_parser.d ./Core/MyApp/App/gps_parser.o ./Core/MyApp/App/gps_parser.su ./Core/MyApp/App/ledjes.cyclo ./Core/MyApp/App/ledjes.d ./Core/MyApp/App/ledjes.o ./Core/MyApp/App/ledjes.su ./Core/MyApp/App/student.cyclo ./Core/MyApp/App/student.d ./Core/MyApp/App/student.o ./Core/MyApp/App/student.su
+	-$(RM) ./Core/MyApp/App/ARM_keys.cyclo ./Core/MyApp/App/ARM_keys.d ./Core/MyApp/App/ARM_keys.o ./Core/MyApp/App/ARM_keys.su ./Core/MyApp/App/Positie_Bepaling.cyclo ./Core/MyApp/App/Positie_Bepaling.d ./Core/MyApp/App/Positie_Bepaling.o ./Core/MyApp/App/Positie_Bepaling.su ./Core/MyApp/App/UART_keys.cyclo ./Core/MyApp/App/UART_keys.d ./Core/MyApp/App/UART_keys.o ./Core/MyApp/App/UART_keys.su ./Core/MyApp/App/admin.cyclo ./Core/MyApp/App/admin.d ./Core/MyApp/App/admin.o ./Core/MyApp/App/admin.su ./Core/MyApp/App/gps.cyclo ./Core/MyApp/App/gps.d ./Core/MyApp/App/gps.o ./Core/MyApp/App/gps.su ./Core/MyApp/App/gps_parser.cyclo ./Core/MyApp/App/gps_parser.d ./Core/MyApp/App/gps_parser.o ./Core/MyApp/App/gps_parser.su
 
 .PHONY: clean-Core-2f-MyApp-2f-App
 

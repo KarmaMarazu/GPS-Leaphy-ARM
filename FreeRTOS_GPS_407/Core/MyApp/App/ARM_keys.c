@@ -14,6 +14,23 @@
 #include <admin.h>
 #include "main.h"
 #include "cmsis_os.h"
+#include "gps.h"
+
+void PrintLog(void)
+{
+	UART_puts("\r\n===============================================================\r\n");
+	for(int i = 0; i <= k; i++)
+	{
+		UART_puts("\r\n=============================================================== Log Number = "); UART_putint(i);
+		UART_puts("\rStatus = "); UART_putchar(Log.Route[i].status);
+		UART_puts("\rLatitude = "); UART_putint((int)Log.Route[i].latitude);
+		UART_puts("\rLongitude = "); UART_putint((int)Log.Route[i].longitude);
+		UART_puts("\rCourse = "); UART_putint((int)Log.Route[i].course);
+		UART_puts("\rLeaphy Actie = "); UART_putint((int)Log.LeaphyActie[i]);
+		UART_puts("\r\n===============================================================");
+	}
+	k = 0;
+}
 
 
 /**
@@ -95,7 +112,8 @@ void ARM_keys_IRQ (void *argument)
 				start = xTaskGetTickCount();								// als de drive_task wordt gestart wordt de begintijd opgeslagen
 			}
 		}
-
+		if(key == 0x000D)
+			PrintLog();
 
 		xTaskNotify(hARM_keys, key, eSetValueWithOverwrite); // notify task2 with value
 	}

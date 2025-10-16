@@ -1,0 +1,7 @@
+../Core/MyApp/App/Positie_Bepaling.c:27:8:DtoR	1
+../Core/MyApp/App/Positie_Bepaling.c:33:8:RtoD	1
+../Core/MyApp/App/Positie_Bepaling.c:43:6:Afstand_Course_Bepalen	1
+../Core/MyApp/App/Positie_Bepaling.c:75:6:Leaphy_Actie_Bepalen	9
+../Core/MyApp/App/Positie_Bepaling.c:116:6:Leaphy_Data_Sturen	11
+../Core/MyApp/App/Positie_Bepaling.c:161:6:Average_Bepalen_Drive	1
+../Core/MyApp/App/Positie_Bepaling.c:177:6:drive_task	3

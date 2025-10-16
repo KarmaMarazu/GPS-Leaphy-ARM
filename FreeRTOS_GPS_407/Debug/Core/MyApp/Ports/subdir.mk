@@ -5,6 +5,7 @@
 
 # Add inputs and outputs from these tool invocations to the build variables 
 C_SRCS += \
+../Core/MyApp/Ports/HC-SR04.c \
 ../Core/MyApp/Ports/buzzer.c \
 ../Core/MyApp/Ports/keys.c \
 ../Core/MyApp/Ports/lcd.c \
@@ -12,6 +13,7 @@ C_SRCS += \
 ../Core/MyApp/Ports/uart.c 
 
 OBJS += \
+./Core/MyApp/Ports/HC-SR04.o \
 ./Core/MyApp/Ports/buzzer.o \
 ./Core/MyApp/Ports/keys.o \
 ./Core/MyApp/Ports/lcd.o \
@@ -19,6 +21,7 @@ OBJS += \
 ./Core/MyApp/Ports/uart.o 
 
 C_DEPS += \
+./Core/MyApp/Ports/HC-SR04.d \
 ./Core/MyApp/Ports/buzzer.d \
 ./Core/MyApp/Ports/keys.d \
 ./Core/MyApp/Ports/lcd.d \
@@ -33,7 +36,7 @@ Core/MyApp/Ports/%.o Core/MyApp/Ports/%.su Core/MyApp/Ports/%.cyclo: ../Core/MyA
 clean: clean-Core-2f-MyApp-2f-Ports
 
 clean-Core-2f-MyApp-2f-Ports:
-	-$(RM) ./Core/MyApp/Ports/buzzer.cyclo ./Core/MyApp/Ports/buzzer.d ./Core/MyApp/Ports/buzzer.o ./Core/MyApp/Ports/buzzer.su ./Core/MyApp/Ports/keys.cyclo ./Core/MyApp/Ports/keys.d ./Core/MyApp/Ports/keys.o ./Core/MyApp/Ports/keys.su ./Core/MyApp/Ports/lcd.cyclo ./Core/MyApp/Ports/lcd.d ./Core/MyApp/Ports/lcd.o ./Core/MyApp/Ports/lcd.su ./Core/MyApp/Ports/leds.cyclo ./Core/MyApp/Ports/leds.d ./Core/MyApp/Ports/leds.o ./Core/MyApp/Ports/leds.su ./Core/MyApp/Ports/uart.cyclo ./Core/MyApp/Ports/uart.d ./Core/MyApp/Ports/uart.o ./Core/MyApp/Ports/uart.su
+	-$(RM) ./Core/MyApp/Ports/HC-SR04.cyclo ./Core/MyApp/Ports/HC-SR04.d ./Core/MyApp/Ports/HC-SR04.o ./Core/MyApp/Ports/HC-SR04.su ./Core/MyApp/Ports/buzzer.cyclo ./Core/MyApp/Ports/buzzer.d ./Core/MyApp/Ports/buzzer.o ./Core/MyApp/Ports/buzzer.su ./Core/MyApp/Ports/keys.cyclo ./Core/MyApp/Ports/keys.d ./Core/MyApp/Ports/keys.o ./Core/MyApp/Ports/keys.su ./Core/MyApp/Ports/lcd.cyclo ./Core/MyApp/Ports/lcd.d ./Core/MyApp/Ports/lcd.o ./Core/MyApp/Ports/lcd.su ./Core/MyApp/Ports/leds.cyclo ./Core/MyApp/Ports/leds.d ./Core/MyApp/Ports/leds.o ./Core/MyApp/Ports/leds.su ./Core/MyApp/Ports/uart.cyclo ./Core/MyApp/Ports/uart.d ./Core/MyApp/Ports/uart.o ./Core/MyApp/Ports/uart.su
 
 .PHONY: clean-Core-2f-MyApp-2f-Ports
 

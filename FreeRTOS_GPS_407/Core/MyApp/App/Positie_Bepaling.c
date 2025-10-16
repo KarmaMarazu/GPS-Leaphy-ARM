@@ -21,6 +21,8 @@ Vector vector;
 #define PI 3.1415926535
 #define r_aarde 6371000
 
+int k = 0;
+
 // Graden naar radialen
 double DtoR(double Graden)
 {
@@ -47,15 +49,21 @@ void Afstand_Course_Bepalen(void)
 
 	// Equirectangular approximation toepassen om de afstand tot waypoint en course te vinden naar waypoint
 	// Omdat de afstanden tussen de punten relatief klein zijn zou de bolling van de aarde ook verwaarloosd worden
-	double x = (radWayLong-radPosLong) * cos((radWayLati+radPosLati)/2);
-	double y = radWayLati-radPosLati;
-	vector.lengte = r_aarde * sqrt(x*x + y*y);
-	vector.course = fmod(RtoD(atan2(x, y)) + 360.0, 360.0);
+	double x_l = (radWayLong-radPosLong) * cos((radWayLati+radPosLati)/2);
+	double y_l = radWayLati-radPosLati;
+	vector.lengte = r_aarde * sqrt(x_l*x_l + y_l*y_l);
+
+
+	double y_c = sin(radPosLati-radWayLati) * cos(radWayLong);
+	double x_c = cos(radPosLong) * sin(radWayLong) - sin(radPosLong) * cos(radWayLong) * cos(radPosLati-radWayLati);
+	vector.course = fmod(RtoD(atan2(x_c, y_c)) + 450.0, 360.0);
+	vector.course = (int)vector.course;
+
 
 	// Print voor het testen
-	UART_puts("\r\rAfstand tussen huidige positie en waypoint = "); UART_putint((int)vector.lengte);
-	UART_puts("\rCourse Richting waypoint vanaf huidige positie = "); UART_putint((int)vector.course);
-	UART_puts("\rHuidige Course = "); UART_putint((int)GNRMC_data.course);
+	//UART_puts("\r\rAfstand tussen huidige positie en waypoint = "); UART_putint((int)vector.lengte);
+	//UART_puts("\rCourse Richting waypoint vanaf huidige positie = "); UART_putint((int)vector.course);
+	//UART_puts("\rHuidige Course = "); UART_putint((int)GNRMC_data.course);
 }
 
 
@@ -67,31 +75,36 @@ void Afstand_Course_Bepalen(void)
 char Leaphy_Actie_Bepalen(int)
 {
 	if(!(GNRMC_data.course))
-		return 0x0F;
+		return 0x01;
 
-	double courseDiff;
+	int course = ((int)GNRMC_data.course + 360) % 360;
+	UART_puts("\rHuidigeCourse = "); UART_putint(course);
+	UART_puts("\rVectorCourse = "); UART_putint(vector.course);
+	int courseDiff;
 
-	// Deze statements zorgen ervoor dat er geen negatieve komen door de kleine waarde - de grote waarde te doen.
-	if(vector.course > GNRMC_data.course)
-		courseDiff = vector.course - GNRMC_data.course;
-	else if(vector.course < GNRMC_data.course)
-		courseDiff = GNRMC_data.course - vector.course;
-	else if(vector.course == GNRMC_data.course)
-		courseDiff = 0;
+	courseDiff = abs(vector.course - course);
+	UART_puts("\rCourseDiff = "); UART_putint(courseDiff);
 
 	// Bepaal aan de hand van het verschil in course hoe erg er gecorrigeerd moet worden.
-	UART_puts("\rCourseDiff = "); UART_putint((int)courseDiff);
-	if(courseDiff >= -25 && courseDiff <= 25) 		// Rechtdoor snel
-		return 0x01;
-	if(courseDiff >= 25 && courseDiff <= 90) 		// langzame bocht rechts
-		return 0x02;
-	if(courseDiff >= 90 && courseDiff <= 180) 		// snelle bocht rechts
-		return 0x03;
-	if(courseDiff <= -25 && courseDiff >= -90) 		// langzame bocht links
-		return 0x04;
-	if(courseDiff >= -90 && courseDiff <= -180) 	// snelle bocht links
-		return 0x05;
-
+	if(courseDiff > 180) 		// Links
+	{
+		courseDiff = abs(courseDiff - 360);
+		if(courseDiff < 30)
+			return 0x01;		// Rechtdoor
+		if(courseDiff < 115)
+			return 0x04;		// Links
+		return 0x05;			// Snel Links
+	}
+	else if(courseDiff < 180) 	// Rechts
+	{
+		if(courseDiff < 30)
+			return 0x01;		// Rechtdoor
+		if(courseDiff < 115)
+			return 0x02;		// Rechts
+		return 0x03;			// Snel Rechts
+	}
+	else if(courseDiff == 0)
+		return 0x01;			// Rechtdoor
 	return 0x00;
 }
 
@@ -102,6 +115,7 @@ char Leaphy_Actie_Bepalen(int)
 */
 void Leaphy_Data_Sturen(char data)
 {
+	Log.LeaphyActie[k] = data;
 	// 4 bits data naar de Arduino sturen. Bits worden bepaald afhankelijk van de functie Leaphy_actie_Bepalen
 	if(0b0001 & data)
 		HAL_GPIO_WritePin(GPIOE, Ard_Bit1_Pin, SET);
@@ -146,13 +160,13 @@ void Leaphy_Data_Sturen(char data)
 */
 void Average_Bepalen_Drive(void)
 {
-	// Gemiddelde nemen van de laatste 3 ingekomen gps berichten
-	xSemaphoreTake(hGNRMC_Struct_Sem, portMAX_DELAY);										// neem de mutex zodat average[] thread safe blijft
+	Log.Route[k] = GNRMC_data;
+	// Gemiddelde nemen van de laatste 3 ingekomen gps berichten										// neem de mutex zodat average[] thread safe blijft
 	Gem.latitude = (average[0].latitude + average[1].latitude + average[2].latitude)/3; 	// gemiddelde wordt berekend en opgeslagen
 	Gem.longitude = (average[0].longitude + average[1].longitude + average[2].longitude)/3;
-	Gem.speed = (average[0].speed + average[1].speed + average[2].speed)/3;
-	xSemaphoreGive(hGNRMC_Struct_Sem);														// geef de mutex op average[] weer terug
+	Gem.speed = (average[0].speed + average[1].speed + average[2].speed)/3;													// geef de mutex op average[] weer terug
 }
+
 
 
 /**
@@ -164,11 +178,24 @@ void drive_task(void*)
 {
 	while(TRUE)
 	{
+		xSemaphoreTake(hGNRMC_Struct_Sem, portMAX_DELAY);
+		if(!(GNRMC_data.status == 'A'))
+		{
+			xSemaphoreGive(hGNRMC_Struct_Sem);
+			osDelay(200);
+			continue;
+		}
 		Average_Bepalen_Drive();
 		Afstand_Course_Bepalen();
-		UART_puts("\rAfstand = "); UART_putint((int)GetDistance()); // tijdelijke print voor de HC-SR04 sensor
+		xSemaphoreGive(hGNRMC_Struct_Sem);
+		//UART_puts("\rAfstand = "); UART_putint((int)GetDistance()); // tijdelijke print voor de HC-SR04 sensor
 		char Data = Leaphy_Actie_Bepalen(1); // 1 moet vervangen worden met GetDistance() zodra deze daarvoor klaar is
 		Leaphy_Data_Sturen(Data);
+		//UART_puts("\rdata = "); UART_putint((int)Data);
+		if(k >= 200)
+				k = 0;
+		k++;
 		osDelay(200);						// tijdelijke delay
 	}
 }
+
