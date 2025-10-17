@@ -1,18 +1,18 @@
 /**
-* @file Leapy_Arduino_motor_bepaling.ino
+* @file Leapy_Arduino_Motor_Bepaling.ino
 * @brief Deze file bevat de code voor het laten bewegen van de motoren. <BR>
 * @author Twan Ton, Mika Dahlkamp, Thomas van Ooijen en Jasper Verduin.
 * @date 16/10/2025.
 */
 
 
-//define snelheid van de linker motor.
+//Define snelheid van de linker motor.
 #define DRAAI_L 220         
 #define FAST_L 180          
 #define SLOW_L 110          
 #define STOP_L 0            
 
-//define snelheid van de rechter motor. 0.914 * snelheid_L voor motor verschil compensatie. 
+//Define snelheid van de rechter motor. 0.914 * snelheid_L voor motor verschil compensatie. 
 #define DRAAI_R 201         
 #define FAST_R 165          
 #define SLOW_R 101          
@@ -32,7 +32,7 @@ const byte PWMR = 6;
 const byte ML = 4;
 const byte MR = 7;
 
-//ontvang data en encode het in hex
+//Ontvang data en encode het in hex
 char Data_Ontvangen(void)
 {
   char data = 0;
@@ -46,18 +46,18 @@ char Data_Ontvangen(void)
   if(analogRead(Bit4)>100) data |= 0b1000;
   else data &= 0b0111;
 
-  //debug data
+  //Debug data
   Serial.println(data, HEX);
   return data;
 }
 
 void Motor_Aansturen(char data)
 {
-  //zet de snelheid van de corresponderende motor op 0
+  //Zet de snelheid van de corresponderende motor op 0
   analogWrite(PWML, 0);
   analogWrite(PWMR, 0);
 
-  //zet de richting van de corresponderende motor op high
+  //Zet de richting van de corresponderende motor op high
   digitalWrite(MR, HIGH);
   digitalWrite(ML, HIGH);
   switch(data)
@@ -99,11 +99,11 @@ void Motor_Aansturen(char data)
               break;
   }
   
-  //debug data
+  //Debug data
   Serial.println(data, HEX);
 }
 
-//setup code
+//Setup code
 void setup() 
 {
   pinMode(Bit1, INPUT);
@@ -117,9 +117,10 @@ void setup()
   Serial.begin(9600);
 }
 
-//functies aan sturen
+//Functies aan sturen
 void loop() 
 {
   char data = Data_Ontvangen();
   Motor_Aansturen(data);
 }
+
