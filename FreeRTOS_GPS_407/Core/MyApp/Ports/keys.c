@@ -1,31 +1,28 @@
-/*
-Author: 	J.F. van der Bent
-			W Pielage & E Helmond
-
-Date:		24-11-2021
-Revision:	5
-
-    keys.c:
-          Keyboard-driver for SpARM-board v2
-
-    pin-info:
-           PD1  - R2
-           PD2  - R3
-           PD3  - R4
-           PD6  - K1
-           PD7  - K2
-           PD8  - K3
-           PD9  - K4
-           PD11 - R1
-
-	Key B1 = 1  ----- key B16 = 16
-
-
-
-To use the keyboard first initialize the ports:
-	KEYS_init();
-After that, you can use polling to read a key with:
-	KEYS_read();
+/**
+* @file keys.c
+* @brief Keyboard-driver for SpARM-board v2
+* @details     pin-info: <br>
+           PD1  - R2 <br>
+           PD2  - R3 <br>
+           PD3  - R4 <br>
+           PD6  - K1 <br>
+           PD7  - K2 <br>
+           PD8  - K3 <br>
+           PD9  - K4 <br>
+           PD11 - R1 <br>
+<br>
+	Key B1 = 1  ----- key B16 = 16 <br>
+<br>
+<br>
+<br>
+To use the keyboard first initialize the ports: <br>
+	KEYS_init(); <br>
+After that, you can use polling to read a key with: <br>
+	KEYS_read(); </br>
+* @author J.F. van der Bent
+* @author W Pielage & E Helmond
+* @version 5
+* @date 24-11-2021
 */
 
 #include "main.h"
