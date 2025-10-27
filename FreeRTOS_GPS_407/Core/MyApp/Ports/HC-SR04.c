@@ -1,5 +1,5 @@
 /**
-* @file HC_SR04.c
+* @file HC-SR04.c
 * @brief Dit bestand bevat de functie en variabelen voor het aansturen van de ultrasonic afstandsensor. <BR>
 * hiervoor moet de .IOC zo zijn aangepast dat de sensor werkt met Timer11.
 * @author Mika Dahlkamp
