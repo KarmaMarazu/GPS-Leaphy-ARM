@@ -29,6 +29,7 @@
 #include "cmsis_os.h"
 #include "task.h"
 #include "admin.h"
+#include "gps.h"
 
 /// output strings for initialization
 char *app_name    = "\r\n=== freeRTOS_GPS 407 ===\r\n";
@@ -44,13 +45,15 @@ QueueHandle_t 	      hUART_Queue; /// uses UART2
 QueueHandle_t 	      hGPS_Queue;  /// uses UART1
 SemaphoreHandle_t     hLED_Sem;
 SemaphoreHandle_t     hGNRMC_Struct_Sem;
+SemaphoreHandle_t	  hLog_Struct_Sem;
 EventGroupHandle_t 	  hKEY_Event;
 TimerHandle_t         hTimer1;
+TimerHandle_t		  hTimerLog;
 
 
 /** tasks[] is een array van structures met alleen de argumenten om een taak aan te maken.
  *
- * - **NB:**<br>
+ * - *NB:*<br>
  * 	- Dit wist je vast niet. De members .attr.name en .attr.stack_size etc. zijn enkele members van de struct osThreadAttr_t;
  * enkele daarvan zijn nodig om een taak te starten en dus alleen die heb ik in deze array geinitialiseerd - dat kan
  * dus op de manier die je hier ziet, dus met een . (punt) ervoor.
@@ -62,7 +65,7 @@ TimerHandle_t         hTimer1;
  * 	- De laatste regel bevat nullen; deze regel wordt gebruikt om for-loepjes eenvoudig te laten eindigen.
  * 	- Om een taak niet te laten starten, zet gewoon '//' voor de regel en Bob is je oom (Bob is your uncle)!
  *
- * - **Doel van de array:**
+ * - *Doel van de array:*
  * 	-# makkelijk en overzichtelijk om taken te starten
  * 	-# geeft een overview van alle taken en argumenten (name, stacksize, prty's)
  */
@@ -92,12 +95,12 @@ TASKDATA tasks[] =
 
 
 /**
- *************************************************************************************************************************
- *************************************************************************************************************************
+ *****************************************
+ *****************************************
  * @remark DEEL 1 van admin.c
  * Bevat de functies voor de initialisatie output, vooral naar UART, zoals het 'menu'
- *************************************************************************************************************************
- *************************************************************************************************************************
+ *****************************************
+ *****************************************
  */
 
 /**
@@ -165,12 +168,12 @@ key: function\r\n\
 
 
 /**
- *************************************************************************************************************************
- *************************************************************************************************************************
+ *****************************************
+ *****************************************
  * @remark DEEL 2 van admin.c
  * Bevat de functies voor het creëren van alle handles
- *************************************************************************************************************************
- *************************************************************************************************************************
+ *****************************************
+ *****************************************
  */
 
 
@@ -208,6 +211,9 @@ void CreateHandles(void)
 	if (!(hGNRMC_Struct_Sem = xSemaphoreCreateMutex()))
 		error_HaltOS("Error hGNRMC_Struct_Sem");
 
+	if (!(hLog_Struct_Sem = xSemaphoreCreateMutex()))
+		error_HaltOS("Error hLog_Struct_Sem");
+
 	if (!(hUART_Queue = xQueueCreate(QSIZE_UART, sizeof(unsigned int))))
 		error_HaltOS("Error hUART_Q");
 
@@ -219,6 +225,9 @@ void CreateHandles(void)
 
 	if (!(hTimer1 = xTimerCreate("Timer_1", pdMS_TO_TICKS(TIMER1_DELAY), pdTRUE, 0, (TimerCallbackFunction_t)Timer1_Handler)))
 		error_HaltOS("Error hTimer1");
+
+	if (!(hTimerLog = xTimerCreate("TimerLog", pdMS_TO_TICKS(TIMERLOG_DELAY), pdTRUE, 0, (TimerCallbackFunction_t)TimerLog_Handler)))
+			error_HaltOS("Error hTimerLog");
 
 	UART_puts("\n\rAll handles created successfully.");
 
@@ -237,16 +246,35 @@ void Timer1_Handler(void)
 	HAL_GPIO_TogglePin(GPIOD, LEDBLUE);   // turns led on/off
 }
 
+/**
+* @brief Vangt de FreeRTOS software-interrupt op van TimerLog en slaat op dat moment een punt op als log in een array
+* @param hTimerLog De handle van de timer
+* @return void
+*/
+void TimerLog_Handler(void)
+{
+	xSemaphoreTake(hLog_Struct_Sem, portMAX_DELAY);					// pak mutex zodat niet halverwegen het schrijven naar het array, nieuwe data in de struct wordt gestopt
+
+	    if(logIndex < MAX_LOGS)										// Check of er nog ruimte is in de array
+	    {
+	    	LogArray[logIndex] = DataLog;							// Kopieer huidige dataLog naar array
+	        LogArray[logIndex].TijdSindsStart = (logIndex*3+3);		// +3 want positie 0 is al na 3 seconde. dus positie 1 is na 6 seconde enz...
+	        logIndex++;
+	    }
+
+	    xSemaphoreGive(hLog_Struct_Sem);							// geef mutex zodat er weer nieuwe data in de struct kan worden geschreven voor een nieuw log 'punt'
+
+}
 
 
 
 /**
- *************************************************************************************************************************
- *************************************************************************************************************************
+ *****************************************
+ *****************************************
  * @remark DEEL 3 van admin.c
  * Bevat de functies voor het creëren van tasks en admin-functies voor tasks
- *************************************************************************************************************************
- *************************************************************************************************************************
+ *****************************************
+ *****************************************
  */
 
 
