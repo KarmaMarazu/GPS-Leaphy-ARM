@@ -7,11 +7,29 @@
 *
 * @date 5/9/2023
 */
+
+// DEFINES start: ==================================================================================================
+// bepalen hoeveel logs er genomen worden.
+#define MAX_LOGS 100
+
+// enum voor NMEA protocolstrings (starting 'e' for enum)
+enum NMEA
+{
+	eGNRMC = 1,
+	eGPGSA,
+	eGNGGA
+};
+// DEFINES stop: ==================================================================================================
+
+
+// FUNCTIES start: ==================================================================================================
 int hex2int(char *c);
 int hexchar2int(char c);
 int checksum_valid(char *string);
-extern int k;
+// FUNCTIES stop: ==================================================================================================
 
+
+//STRUCTURES start: ====================================================================================================
 /// GNRMC struct: all with char-members - should/could be improved with proper data-elements
 typedef struct _GNRMC
 {
@@ -37,9 +55,10 @@ typedef struct _Data_Parser
 	char 	status;
 	double  latitude;  		// 3. ddmm.mmmm (double)
 	double  longitude; 		// 5. ddmm.mmmm (double)
-	double  speed;      	// 7. 0.13 knots (double)
 	double  course;   	// 8. 309.62 degrees (double)
 } Data_Parser;
+
+
 
 /// Struct voor het bij elkaar houden van de vector tussen Leaphy en Waypoint
 typedef struct Vector
@@ -48,28 +67,33 @@ typedef struct Vector
 	double course;
 } Vector;
 
-// Struct voor de data log deze kan uitgelezen worden door de debug poort aantesluiten op je laptop
-// en de terminal te openen zodra het juiste knopje is ingedrukt wordt deze struct geprint
-typedef struct _DataLog
-{
-	int VerstrekenTijd;
-	char ErrorLog [200][200];
-	Data_Parser Route [200];
-	char LeaphyActie[200];
-} Data_Log;
 
-
-// enum voor NMEA protocolstrings (starting 'e' for enum)
-enum NMEA
+/// struct om als verzamelplaats te fungeren voor data die gelogd moeten worden. Deze data wordt op verschillende plaatsen opgeslagen.
+struct Log
 {
-	eGNRMC = 1,
-	eGPGSA,
-	eGNGGA
+	Data_Parser 	Route;
+	int		TijdSindsStart;
 };
 
+// Struct voor de data log deze kan uitgelezen worden door de debug poort aantesluiten op je laptop
+// en de terminal te openen zodra het juiste knopje is ingedrukt wordt deze struct geprint
+//typedef struct _DataLog
+//{
+//	TickType_t VerstrekenTijd;
+//	char ErrorLog [200][200];
+//	Data_Parser Route [200];
+//	char LeaphyActie[200];
+//} Data_Log;
+//STRUCTURES stop: ====================================================================================================
+
+
+
+
+
+// EXTERNS start: ==================================================================================================
 /// struct waar gps string in wordt opgeslagen
 extern GNRMC gnrmc;
-/// struct om de string om te zetten naar cijfers.
+/// struct om de string om te zetten naar cijfers
 extern Data_Parser GNRMC_data;
 /// struct om huidige positie in op te slaan
 extern Data_Parser Gem;
@@ -77,5 +101,20 @@ extern Data_Parser Gem;
 extern Data_Parser waypoints[MAX_WAYPOINTS];
 /// array van structs om hiervan een 1 gemiddelde waarde te maken
 extern Data_Parser average[3];
+/// struct om als verzamelplaats te fungeren voor data die gelogd moeten worden
+extern struct Log DataLog;
+/// array van structs om hierin op te slaan wat er gebeurd terwijl in drive mode
+extern struct Log LogArray[MAX_LOGS];
 
-extern Data_Log Log;
+// functie om de LogArray te resetten staat in gps_parser.c
+extern void ResetLogArray(void);
+
+extern int logIndex;
+// EXTERNS stop: ==================================================================================================
+
+
+
+
+
+//extern int k;
+//extern Data_Log Log;
