@@ -1,31 +1,27 @@
-/*
-Author: 	J.F. van der Bent
-			W Pielage & E Helmond
-
-Date:		24-11-2021
-Revision:	5
-
-    uart.c:
-          UART2 driver for ARM-board V5
-
-    pin-info:
-           PA2 - TX
-           PA3 - RX
-
-To enable UART use the following line:
-	UART_init();
-To use UART on interrupt base use:
-	UART_INT_init();
-
-This file initialize the UART on the ARM-board v5.
-To send data to the UART use:
-	UART_printf(*string);
-
-
-In the interrupt routine the char is send back to the terminal
-07-07-2014 Aanpassen Uart routine om compatibel te zijn met void UART_put(char *c)
-24011-2021 aanpassen van de Uart lib naar HAL
-
+/**
+* @file uart.c
+* @brief UART-driver voor ARM-board V5
+* @details pin-info:<br>
+           PA2 - TX <br>
+           PA3 - RX <br>
+<br>
+To enable UART use the following line:<br>
+	UART_init();<br>
+To use UART on interrupt base use:<br>
+	UART_INT_init();<br>
+<br>
+This file initialize the UART on the ARM-board v5.<br>
+To send data to the UART use:<br>
+	UART_printf(*string);<br>
+<br>
+<br>
+In the interrupt routine the char is send back to the terminal<br>
+07-07-2014 Aanpassen Uart routine om compatibel te zijn met void UART_put(char *c)<br>
+24-11-2021 aanpassen van de Uart lib naar HAL</br>
+* @author J.F. van der Bent
+* @author W Pielage & E Helmond
+* @version 5
+* @date 24-11-2021
 */
 
 /* Includes ------------------------------------------------------------------*/
