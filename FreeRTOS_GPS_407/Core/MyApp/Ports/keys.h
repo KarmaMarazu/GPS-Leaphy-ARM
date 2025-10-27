@@ -26,6 +26,7 @@ After that, you can use polling to read a key with:
 	07-07-2014 toevoeging defines key values
 */
 
+
 /****************Libraries******************************/
 /* Libraries needed for Keys are (These are in main.h):
  * #include "stm32f4xx.h"
