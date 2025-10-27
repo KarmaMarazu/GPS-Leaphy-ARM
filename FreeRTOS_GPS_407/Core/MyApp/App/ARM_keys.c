@@ -16,20 +16,33 @@
 #include "cmsis_os.h"
 #include "gps.h"
 
+//void PrintLog(void)
+//{
+//	UART_puts("\r\n===============================================================\r\n");
+//	for(int i = 0; i <= k; i++)
+//	{
+//		UART_puts("\r\n=============================================================== Log Number = "); UART_putint(i);
+//		UART_puts("\rStatus = "); UART_putchar(Log.Route[i].status);
+//		UART_puts("\rLatitude = "); UART_putint((int)Log.Route[i].latitude);
+//		UART_puts("\rLongitude = "); UART_putint((int)Log.Route[i].longitude);
+//		UART_puts("\rCourse = "); UART_putint((int)Log.Route[i].course);
+//		UART_puts("\rLeaphy Actie = "); UART_putint((int)Log.LeaphyActie[i]);
+//		UART_puts("\r\n===============================================================");
+//	}
+//	k = 0;
+//}
+
 void PrintLog(void)
 {
-	UART_puts("\r\n===============================================================\r\n");
-	for(int i = 0; i <= k; i++)
+	for(int i = 0; i<logIndex; i++)
 	{
-		UART_puts("\r\n=============================================================== Log Number = "); UART_putint(i);
-		UART_puts("\rStatus = "); UART_putchar(Log.Route[i].status);
-		UART_puts("\rLatitude = "); UART_putint((int)Log.Route[i].latitude);
-		UART_puts("\rLongitude = "); UART_putint((int)Log.Route[i].longitude);
-		UART_puts("\rCourse = "); UART_putint((int)Log.Route[i].course);
-		UART_puts("\rLeaphy Actie = "); UART_putint((int)Log.LeaphyActie[i]);
-		UART_puts("\r\n===============================================================");
+		UART_puts("\r\r\n=============================================================== Log Number = "); UART_putint(i);
+		UART_puts("\rStatus: "); UART_putchar((int)LogArray[i].Route.status);
+		UART_puts("\rLatitude: "); UART_putint((int)LogArray[i].Route.latitude);
+		UART_puts("\rLongitude: "); UART_putint((int)LogArray[i].Route.longitude);
+		UART_puts("\rcourse: "); UART_putint((int)LogArray[i].Route.course);
+		UART_puts("tijd sinds start rijden: "); UART_putint(LogArray[i].TijdSindsStart);
 	}
-	k = 0;
 }
 
 
@@ -66,6 +79,7 @@ void ARM_keys_IRQ (void *argument)
 	UART_puts("\r\n"); UART_puts((char *)__func__); UART_puts(" started");
 
 	vTaskSuspend(GetTaskhandle("drive_task"));					// stopt de drivetask bij opstart
+	xTimerStop(hTimerLog, 0);									// stopt de timer die de log opslaat
 
 	if (!(hARM_keys = GetTaskhandle("ARM_keys_task")))
 		error_HaltOS("Err:ARM_hndle");
@@ -99,6 +113,8 @@ void ARM_keys_IRQ (void *argument)
 				stop = xTaskGetTickCount() - start;							// slaat de vertreken tijd op sinds drive_task is gestart. max 4294967 sec
 				UART_puts("\rtijds sinds start drive mode: ");	UART_putint(stop/1000); 	UART_puts(" seconden");
 
+				xTimerStop(hTimerLog, 0);									// stopt de log timer als waypoints worden opgeslagen
+
 			}
 			else if(j%2 == 1)
 			{
@@ -108,6 +124,9 @@ void ARM_keys_IRQ (void *argument)
 				HAL_GPIO_WritePin(GPIOD, LEDRED, GPIO_PIN_RESET);			// rode led is route opslaan
 				HAL_GPIO_WritePin(GPIOD, LEDGREEN, GPIO_PIN_SET);			// groene led is drive mode
 				xSemaphoreGive(hGNRMC_Struct_Sem);
+
+				ResetLogArray();											// Nieuw begin van drive mode dus ook nieuwe log
+				xTimerStart(hTimerLog, 0);									// start de log timer als drivemode aan staat
 
 				start = xTaskGetTickCount();								// als de drive_task wordt gestart wordt de begintijd opgeslagen
 			}
@@ -155,4 +174,3 @@ void ARM_keys_task (void *argument)
      	taskYIELD(); // done, force context switch
 	}
 }
-
