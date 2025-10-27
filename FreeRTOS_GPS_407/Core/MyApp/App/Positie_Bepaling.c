@@ -21,7 +21,6 @@ Vector vector;
 #define PI 3.1415926535
 #define r_aarde 6371000
 
-int k = 0;
 
 // Graden naar radialen
 double DtoR(double Graden)
@@ -74,10 +73,10 @@ void Afstand_Course_Bepalen(void)
 */
 char Leaphy_Actie_Bepalen(int)
 {
-	if(!(GNRMC_data.course))
+	if(!(GNRMC_data.course))										// gebruik gnrmc_data want course kan 0 zijn waardoor gemiddelde niet meer werkt.
 		return 0x01;
 
-	int course = ((int)GNRMC_data.course + 360) % 360;
+	int course = ((int)GNRMC_data.course + 360) % 360;				//
 	UART_puts("\rHuidigeCourse = "); UART_putint(course);
 	UART_puts("\rVectorCourse = "); UART_putint(vector.course);
 	int courseDiff;
@@ -115,7 +114,7 @@ char Leaphy_Actie_Bepalen(int)
 */
 void Leaphy_Data_Sturen(char data)
 {
-	Log.LeaphyActie[k] = data;
+
 	// 4 bits data naar de Arduino sturen. Bits worden bepaald afhankelijk van de functie Leaphy_actie_Bepalen
 	if(0b0001 & data)
 		HAL_GPIO_WritePin(GPIOE, Ard_Bit1_Pin, SET);
@@ -155,17 +154,20 @@ void Leaphy_Data_Sturen(char data)
 }
 
 /**
-* @brief Functie om gemiddelde van 3 datapunten op de slaan voor nauwkeurigere locatie.
+* @brief Functie om gemiddelde van 3 datapunten op de slaan voor nauwkeurigere locatie alleen de coordinaten want course kan ook 0 zijn waardoor het gemiddelde niet werkt.
 * @return void
 */
 void Average_Bepalen_Drive(void)
 {
-	Log.Route[k] = GNRMC_data;
-	// Gemiddelde nemen van de laatste 3 ingekomen gps berichten										// neem de mutex zodat average[] thread safe blijft
+	// Gemiddelde nemen van de laatste 3 ingekomen gps berichten
 	Gem.latitude = (average[0].latitude + average[1].latitude + average[2].latitude)/3; 	// gemiddelde wordt berekend en opgeslagen
 	Gem.longitude = (average[0].longitude + average[1].longitude + average[2].longitude)/3;
-	Gem.speed = (average[0].speed + average[1].speed + average[2].speed)/3;													// geef de mutex op average[] weer terug
 }
+
+
+
+
+
 
 
 
@@ -176,6 +178,8 @@ void Average_Bepalen_Drive(void)
 */
 void drive_task(void*)
 {
+	char Data;
+
 	while(TRUE)
 	{
 		xSemaphoreTake(hGNRMC_Struct_Sem, portMAX_DELAY);
@@ -189,13 +193,12 @@ void drive_task(void*)
 		Afstand_Course_Bepalen();
 		xSemaphoreGive(hGNRMC_Struct_Sem);
 		//UART_puts("\rAfstand = "); UART_putint((int)GetDistance()); // tijdelijke print voor de HC-SR04 sensor
-		char Data = Leaphy_Actie_Bepalen(1); // 1 moet vervangen worden met GetDistance() zodra deze daarvoor klaar is
+		Data = Leaphy_Actie_Bepalen(1); // 1 moet vervangen worden met GetDistance() zodra deze daarvoor klaar is
 		Leaphy_Data_Sturen(Data);
 		//UART_puts("\rdata = "); UART_putint((int)Data);
-		if(k >= 200)
-				k = 0;
-		k++;
+//		if(k >= 200)
+//				k = 0;
+//		k++;
 		osDelay(200);						// tijdelijke delay
 	}
 }
-
