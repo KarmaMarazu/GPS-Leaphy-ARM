@@ -1,32 +1,30 @@
-/*
-Author: 	J.F. van der Bent
-			W Pielage & E Helmond
-
-Date:		24-11-2021
-Revision:	5
-    lcd.c:
-          LCD-driver ARM-board v5
-
-    pin-info:
-           PE2  - DB4   --->> PE3
-           PE4  - DB5
-           PE5  - DB6
-           PE6  - DB7
-           PC13 - E:  start data
-           PC15 - RS: register-select
-           PC14 - RW: read/write
-
-    opmerkingen:
+/**
+* @file lcd.c
+* @brief LCD-driver voor ARM-board V5
+* @details pin-info:<br>
+		   PE2  - DB4   --->> PE3<br>
+		   PE4  - DB5<br>
+		   PE5  - DB6<br>
+		   PE6  - DB7<br>
+		   PC13 - E:  start data<br>
+		   PC15 - RS: register-select<br>
+		   PC14 - RW: read/write<br>
+		   <br>
+    opmerkingen:<br>
                 -Alle instructies voor het display staan achterstevoren! (maakt
-                 de code wat eenvoudiger)
+                 de code wat eenvoudiger)<br>
                 -Zorg ervoor dat de delay-code ook wordt meegecompileerd, anders
-                 gaat het hier mis...
+                 gaat het hier mis...<br>
                 -Deze code is gebaseerd op
                  "LCD routines for OLIMEX LPC-MT-2106,16x2 Character LCD 1602K,
-                  4-bit mode operation",
-                 Copyright (c) 2004 senz at arm.dreamislife.com
-                 15-07-2014 aanpassing voor 1x16 display define eenregel bepaald type display J.F. van der Bent
-                 20-10-2021 aanpassing naar de HAL lib
+                  4-bit mode operation"<br>
+                 Copyright (c) 2004 senz at arm.dreamislife.com<br>
+                 15-07-2014 aanpassing voor 1x16 display define eenregel bepaald type display J.F. van der Bent<br>
+                 20-10-2021 aanpassing naar de HAL lib</br>
+* @author J.F. van der Bent
+* @author W Pielage & E Helmond
+* @version 5
+* @date 24-11-2021
 */
 
 #include "main.h"
