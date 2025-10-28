@@ -47,7 +47,7 @@ typedef struct TaskData
 	osThreadId_t         hTask;    /// taskhandle, aangemaakt door osThreadNew()
 } TASKDATA, *PTASKDATA;			   ///  typedefs of struct itself and pointer to it
 
-
+extern TASKDATA tasks[];
 
 /// alle handles
 /// handle voor UART-queue
@@ -136,6 +136,5 @@ extern void drive_task(void*);
 extern void Timer1_Handler(void);
 extern void TimerLog_Handler(void);
 
-// HC-SR04.c
-
-extern int GetDistance(void);
+// HC-SR04
+extern void GetDistance(void* );

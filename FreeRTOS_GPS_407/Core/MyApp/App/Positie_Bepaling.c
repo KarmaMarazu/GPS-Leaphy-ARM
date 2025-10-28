@@ -20,7 +20,9 @@ Vector vector;
 
 #define PI 3.1415926535
 #define r_aarde 6371000
+#define Waypoint_Drempel 2
 
+int WaypointIndex = 0; // globale teller voor de behaalde waypoints
 
 // Graden naar radialen
 double DtoR(double Graden)
@@ -39,30 +41,38 @@ double RtoD(double Radialen)
 * Eigelijk ben je aan het pythagorassen maar dan met de extra stap van de bolling van de aarde.
 * @return void
 */
-void Afstand_Course_Bepalen(void)
+int Afstand_Course_Bepalen(void)
 {
-	double radPosLong = DtoR(Gem.longitude);
-	double radPosLati = DtoR(Gem.latitude);
-	double radWayLong = DtoR(waypoints[0].longitude); // 0 later vervangen met het te zoeken waypoint
-	double radWayLati = DtoR(waypoints[0].latitude);
+	double radPosLong = DtoR(GNRMC_data.longitude);
+	double radPosLati = DtoR(GNRMC_data.latitude);
+
+	double radWayLong = DtoR(waypoints[WaypointIndex].longitude);
+	double radWayLati = DtoR(waypoints[WaypointIndex].latitude);
 
 	// Equirectangular approximation toepassen om de afstand tot waypoint en course te vinden naar waypoint
+	// De gebruikte formules zijn te vinden op "https://www.movable-type.co.uk/scripts/latlong.html"
 	// Omdat de afstanden tussen de punten relatief klein zijn zou de bolling van de aarde ook verwaarloosd worden
 	double x_l = (radWayLong-radPosLong) * cos((radWayLati+radPosLati)/2);
 	double y_l = radWayLati-radPosLati;
 	vector.lengte = r_aarde * sqrt(x_l*x_l + y_l*y_l);
 
-
-	double y_c = sin(radPosLati-radWayLati) * cos(radWayLong);
-	double x_c = cos(radPosLong) * sin(radWayLong) - sin(radPosLong) * cos(radWayLong) * cos(radPosLati-radWayLati);
-	vector.course = fmod(RtoD(atan2(x_c, y_c)) + 450.0, 360.0);
-	vector.course = (int)vector.course;
-
+	// Bearing vanaf de leaphy richting de waypoint berekenen
+	// De gebruikte formules zijn te vinden op "https://www.movable-type.co.uk/scripts/latlong.html"
+	double y_c = sin(radWayLati-radPosLati) * cos(radPosLong);
+	double x_c = cos(radWayLong) * sin(radPosLong) - sin(radWayLong) * cos(radPosLong) * cos(radWayLati-radPosLati);
+	vector.course = (int)(fmod(RtoD(atan2(x_c, y_c)) + 450.0, 360.0)); // + 450 omdat het resultaat anders 90 graden verschoven is
 
 	// Print voor het testen
-	//UART_puts("\r\rAfstand tussen huidige positie en waypoint = "); UART_putint((int)vector.lengte);
+	UART_puts("\r\rAfstand tussen huidige positie en waypoint = "); UART_putint((int)vector.lengte);
 	//UART_puts("\rCourse Richting waypoint vanaf huidige positie = "); UART_putint((int)vector.course);
+	//UART_puts("\rlongi = "); UART_putint((int)(Gem.longitude*100000));
+	//UART_puts("\rlati = "); UART_putint((int)(Gem.latitude*100000));
+	//UART_puts("\rWPlongi = "); UART_putint((int)(waypoints[l].longitude));
+	//UART_puts("\rWPlati = "); UART_putint((int)(waypoints[l].latitude));
 	//UART_puts("\rHuidige Course = "); UART_putint((int)GNRMC_data.course);
+	if(vector.lengte < Waypoint_Drempel)
+		return 1;
+	return 0;
 }
 
 
@@ -71,40 +81,42 @@ void Afstand_Course_Bepalen(void)
 * @param int afstand gelezen door de sensor
 * @return void
 */
-char Leaphy_Actie_Bepalen(int)
+char Leaphy_Actie_Bepalen(void)
 {
-	if(!(GNRMC_data.course))										// gebruik gnrmc_data want course kan 0 zijn waardoor gemiddelde niet meer werkt.
+	UART_puts("\rAfstand = "); UART_putint(distance);
+	if(distance < 40)
+		return 0x06;
+
+	if(!(GNRMC_data.course))
 		return 0x01;
 
-	int course = ((int)GNRMC_data.course + 360) % 360;				//
+	int course = ((int)GNRMC_data.course + 360) % 360;
 	UART_puts("\rHuidigeCourse = "); UART_putint(course);
 	UART_puts("\rVectorCourse = "); UART_putint(vector.course);
-	int courseDiff;
 
-	courseDiff = abs(vector.course - course);
+	int courseDiff = vector.course - course;
 	UART_puts("\rCourseDiff = "); UART_putint(courseDiff);
-
 	// Bepaal aan de hand van het verschil in course hoe erg er gecorrigeerd moet worden.
-	if(courseDiff > 180) 		// Links
+
+	int absDiff = abs(courseDiff);
+	if(courseDiff > 0)
 	{
-		courseDiff = abs(courseDiff - 360);
-		if(courseDiff < 30)
+		if(absDiff < 30)
 			return 0x01;		// Rechtdoor
-		if(courseDiff < 115)
-			return 0x04;		// Links
-		return 0x05;			// Snel Links
-	}
-	else if(courseDiff < 180) 	// Rechts
-	{
-		if(courseDiff < 30)
-			return 0x01;		// Rechtdoor
-		if(courseDiff < 115)
+		if(absDiff < 230)
 			return 0x02;		// Rechts
 		return 0x03;			// Snel Rechts
 	}
-	else if(courseDiff == 0)
-		return 0x01;			// Rechtdoor
-	return 0x00;
+	else if(courseDiff < 0)
+	{
+		if(courseDiff < 30)
+			return 0x01;		// Rechtdoor
+		if(courseDiff < 230)
+			return 0x04;		// Links
+		return 0x05;			// Snel Links
+	}
+
+	return 0x01;
 }
 
 /**
@@ -176,29 +188,28 @@ void Average_Bepalen_Drive(void)
 * Dan moet de leaphy de waypoints volgens zonder tegen een muur aan te botsen.
 * @return void
 */
-void drive_task(void*)
+void drive_task(void* argument)
 {
-	char Data;
-
 	while(TRUE)
 	{
+		ulTaskNotifyTake(0x00, portMAX_DELAY);
 		xSemaphoreTake(hGNRMC_Struct_Sem, portMAX_DELAY);
-		if(!(GNRMC_data.status == 'A'))
-		{
-			xSemaphoreGive(hGNRMC_Struct_Sem);
-			osDelay(200);
-			continue;
-		}
+
 		Average_Bepalen_Drive();
-		Afstand_Course_Bepalen();
+		int WPBehaald = Afstand_Course_Bepalen();
+
 		xSemaphoreGive(hGNRMC_Struct_Sem);
-		//UART_puts("\rAfstand = "); UART_putint((int)GetDistance()); // tijdelijke print voor de HC-SR04 sensor
-		Data = Leaphy_Actie_Bepalen(1); // 1 moet vervangen worden met GetDistance() zodra deze daarvoor klaar is
-		Leaphy_Data_Sturen(Data);
-		//UART_puts("\rdata = "); UART_putint((int)Data);
-//		if(k >= 200)
-//				k = 0;
-//		k++;
-		osDelay(200);						// tijdelijke delay
+
+		if(WPBehaald == 1 && WaypointIndex <= (int)argument) // als WPBehaald 1 is wordt de teller l verhoogd om het volgende waypoint aantegeven voor Afstand_course_Bepalen
+			WaypointIndex++;
+		Leaphy_Data_Sturen(Leaphy_Actie_Bepalen());
+
+		LCD_clear(); 						// LCD legen
+		LCD_putint(WaypointIndex); 			// waypoint nummer op LCD
+		LCD_put("/");
+		LCD_putint((int)argument);
+		LCD_put(" Behaald");
+
+		osDelay(50);						// tijdelijke delay
 	}
 }

@@ -89,6 +89,9 @@ TASKDATA tasks[] =
 { GNRMC_Parser, NULL, .attr.name = "GNRMC_Parser", .attr.stack_size = 800, .attr.priority = osPriorityNormal1},
 { drive_task, NULL, . attr.name = "drive_task", .attr.stack_size = 600, .attr.priority = osPriorityNormal2},
 
+// HC-SR04.c
+{ GetDistance, NULL, .attr.name = "GetDistance", .attr.stack_size = 400, .attr.priority = osPriorityNormal1},
+
   // deze laatste niet wissen, wordt gebruik als 'terminator' in for-loops
 { NULL,         NULL, .attr.name = NULL,           .attr.stack_size = 0,       .attr.priority = 0 }
 };

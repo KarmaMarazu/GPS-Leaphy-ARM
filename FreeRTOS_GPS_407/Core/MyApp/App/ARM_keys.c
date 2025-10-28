@@ -16,22 +16,6 @@
 #include "cmsis_os.h"
 #include "gps.h"
 
-//void PrintLog(void)
-//{
-//	UART_puts("\r\n===============================================================\r\n");
-//	for(int i = 0; i <= k; i++)
-//	{
-//		UART_puts("\r\n=============================================================== Log Number = "); UART_putint(i);
-//		UART_puts("\rStatus = "); UART_putchar(Log.Route[i].status);
-//		UART_puts("\rLatitude = "); UART_putint((int)Log.Route[i].latitude);
-//		UART_puts("\rLongitude = "); UART_putint((int)Log.Route[i].longitude);
-//		UART_puts("\rCourse = "); UART_putint((int)Log.Route[i].course);
-//		UART_puts("\rLeaphy Actie = "); UART_putint((int)Log.LeaphyActie[i]);
-//		UART_puts("\r\n===============================================================");
-//	}
-//	k = 0;
-//}
-
 void PrintLog(void)
 {
 	for(int i = 0; i<logIndex; i++)
@@ -70,11 +54,15 @@ void ARM_keys_IRQ (void *argument)
 {
 	unsigned int 	key;
 	unsigned int 	j = 0;
+	int 			i = 0;
 	TickType_t		start = 0;
 	TickType_t		stop;
 	osThreadId_t 	hARM_keys;
 	osThreadId_t 	hData_opslaanTask;
 	TaskStatus_t    TaskDetails;
+	PTASKDATA 		ptd = tasks;
+
+	ptd++;
 
 	UART_puts("\r\n"); UART_puts((char *)__func__); UART_puts(" started");
 
@@ -108,6 +96,10 @@ void ARM_keys_IRQ (void *argument)
 				vTaskSuspend(GetTaskhandle("drive_task"));					// stopt de drivetask
 				HAL_GPIO_WritePin(GPIOD, LEDRED, GPIO_PIN_SET);				// rode led is route opslaan
 				HAL_GPIO_WritePin(GPIOD, LEDGREEN, GPIO_PIN_RESET);			// groene led is drive mode
+				HAL_GPIO_WritePin(GPIOE, Ard_Bit1_Pin, RESET);				// reset alle bit pins naar arduino anders blijven motoren draaien na het uitgaan van drive mode
+				HAL_GPIO_WritePin(GPIOE, Ard_Bit2_Pin, RESET);
+				HAL_GPIO_WritePin(GPIOE, Ard_Bit3_Pin, RESET);
+				HAL_GPIO_WritePin(GPIOE, Ard_Bit4_Pin, RESET);
 				xSemaphoreGive(hGNRMC_Struct_Sem);
 
 				stop = xTaskGetTickCount() - start;							// slaat de vertreken tijd op sinds drive_task is gestart. max 4294967 sec
@@ -118,6 +110,10 @@ void ARM_keys_IRQ (void *argument)
 			}
 			else if(j%2 == 1)
 			{
+				for (; waypoints[i].longitude != 0; i++){} 					// aantal gezette waypoints bepalen
+				UART_puts("\rwaypoints = "); UART_putint(i);
+				ptd->argument = (void *)(intptr_t)i;
+
 				xSemaphoreTake(hGNRMC_Struct_Sem, portMAX_DELAY);			// wacht totdat de task klaar is met de mutex
 				vTaskSuspend(GetTaskhandle("data_opslaanTask"));			// start de waypoints opslaan task
 				vTaskResume(GetTaskhandle("drive_task"));					// start de drivetask
@@ -131,6 +127,9 @@ void ARM_keys_IRQ (void *argument)
 				start = xTaskGetTickCount();								// als de drive_task wordt gestart wordt de begintijd opgeslagen
 			}
 		}
+		if(key == 0x0003) // reset behaalde waypoints
+			WaypointIndex = 0;
+
 		if(key == 0x000D)
 			PrintLog();
 
