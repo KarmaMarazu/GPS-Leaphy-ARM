@@ -29,6 +29,7 @@
 /// set software timer 500 msecs
 #define TIMER1_DELAY 500
 #define TIMERLOG_DELAY 3000
+#define TIMERCOURSE_DELAY 1000
 
 #define GPS_MAXLEN 79+4 /// $+CR+LF+'\0'
 /** The carriage return [CR] and the line feed [LF] combination terminate the sentence.
@@ -66,6 +67,8 @@ extern EventGroupHandle_t hKEY_Event;
 extern TimerHandle_t      hTimer1;
 /// handle voor log timer
 extern TimerHandle_t	  hTimerLog;
+
+extern TimerHandle_t	  hTimerCourse;
 
 /// debug naar uart output, zie uart_keys.c
 /// bitmask-toggle key voor task-debug-output
@@ -135,6 +138,7 @@ extern void drive_task(void*);
 // timer.c
 extern void Timer1_Handler(void);
 extern void TimerLog_Handler(void);
+extern void TimerCourse_Handler(void);
 
 // HC-SR04
 extern void GetDistance(void* );

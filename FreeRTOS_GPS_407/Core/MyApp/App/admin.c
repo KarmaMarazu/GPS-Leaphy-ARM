@@ -49,6 +49,7 @@ SemaphoreHandle_t	  hLog_Struct_Sem;
 EventGroupHandle_t 	  hKEY_Event;
 TimerHandle_t         hTimer1;
 TimerHandle_t		  hTimerLog;
+TimerHandle_t		  hTimerCourse;
 
 
 /** tasks[] is een array van structures met alleen de argumenten om een taak aan te maken.
@@ -232,6 +233,9 @@ void CreateHandles(void)
 	if (!(hTimerLog = xTimerCreate("TimerLog", pdMS_TO_TICKS(TIMERLOG_DELAY), pdTRUE, 0, (TimerCallbackFunction_t)TimerLog_Handler)))
 			error_HaltOS("Error hTimerLog");
 
+	if (!(hTimerCourse = xTimerCreate("TimerCourse", pdMS_TO_TICKS(TIMERCOURSE_DELAY), pdTRUE, 0, (TimerCallbackFunction_t)TimerCourse_Handler)))
+				error_HaltOS("Error hTimerCourse");
+
 	UART_puts("\n\rAll handles created successfully.");
 
 	UART_puts("\n\rTimer set to: ");
@@ -269,6 +273,10 @@ void TimerLog_Handler(void)
 
 }
 
+void TimerCourse_Handler(void)
+{
+
+}
 
 
 /**
