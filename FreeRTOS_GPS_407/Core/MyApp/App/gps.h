@@ -113,6 +113,8 @@ extern int WaypointIndex;
 
 extern int logIndex;
 
+extern int HoeveelheidWaypoints;
+
 // HC-SR04 afstand vanaf obstacle
 extern uint16_t distance;
 // EXTERNS stop: ==================================================================================================

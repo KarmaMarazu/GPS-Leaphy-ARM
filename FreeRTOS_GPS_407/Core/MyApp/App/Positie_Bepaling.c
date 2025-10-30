@@ -20,7 +20,7 @@ Vector vector;
 
 #define PI 3.1415926535
 #define r_aarde 6371000
-#define Waypoint_Drempel 2
+#define Waypoint_Drempel 3
 
 int WaypointIndex = 0; // globale teller voor de behaalde waypoints
 
@@ -60,7 +60,7 @@ int Afstand_Course_Bepalen(void)
 	// De gebruikte formules zijn te vinden op "https://www.movable-type.co.uk/scripts/latlong.html"
 	double y_c = sin(radWayLati-radPosLati) * cos(radPosLong);
 	double x_c = cos(radWayLong) * sin(radPosLong) - sin(radWayLong) * cos(radPosLong) * cos(radWayLati-radPosLati);
-	vector.course = (int)(fmod(RtoD(atan2(x_c, y_c)) + 450.0, 360.0)); // + 450 omdat het resultaat anders 90 graden verschoven is
+	vector.course = (int)(fmod(RtoD(atan2(x_c, y_c)) + 360.0, 360.0));
 
 	// Print voor het testen
 	UART_puts("\r\rAfstand tussen huidige positie en waypoint = "); UART_putint((int)vector.lengte);
@@ -83,7 +83,7 @@ int Afstand_Course_Bepalen(void)
 */
 char Leaphy_Actie_Bepalen(void)
 {
-	UART_puts("\rAfstand = "); UART_putint(distance);
+	//UART_puts("\rAfstand = "); UART_putint(distance);
 	if(distance < 40)
 		return 0x06;
 
@@ -99,23 +99,26 @@ char Leaphy_Actie_Bepalen(void)
 	// Bepaal aan de hand van het verschil in course hoe erg er gecorrigeerd moet worden.
 
 	int absDiff = abs(courseDiff);
-	if(courseDiff > 0)
+	if(courseDiff < 0)
 	{
-		if(absDiff < 30)
+		if(absDiff >= 180)
+			return 0x03;			// Snel Rechts
+		if(absDiff < 10)
 			return 0x01;		// Rechtdoor
-		if(absDiff < 230)
-			return 0x02;		// Rechts
-		return 0x03;			// Snel Rechts
-	}
-	else if(courseDiff < 0)
-	{
-		if(courseDiff < 30)
-			return 0x01;		// Rechtdoor
-		if(courseDiff < 230)
+		if(absDiff < 150)
 			return 0x04;		// Links
 		return 0x05;			// Snel Links
 	}
-
+	else if(courseDiff > 0)
+	{
+		if(courseDiff >= 180)
+			return 0x05;			// Snel Links
+		if(courseDiff < 10)
+			return 0x01;		// Rechtdoor
+		if(courseDiff < 150)
+			return 0x02;		// Rechts
+		return 0x03;			// Snel Rechts
+	}
 	return 0x01;
 }
 
@@ -168,20 +171,13 @@ void Leaphy_Data_Sturen(char data)
 /**
 * @brief Functie om gemiddelde van 3 datapunten op de slaan voor nauwkeurigere locatie alleen de coordinaten want course kan ook 0 zijn waardoor het gemiddelde niet werkt.
 * @return void
-*/
+*//*
 void Average_Bepalen_Drive(void)
 {
 	// Gemiddelde nemen van de laatste 3 ingekomen gps berichten
 	Gem.latitude = (average[0].latitude + average[1].latitude + average[2].latitude)/3; 	// gemiddelde wordt berekend en opgeslagen
 	Gem.longitude = (average[0].longitude + average[1].longitude + average[2].longitude)/3;
-}
-
-
-
-
-
-
-
+}*/
 
 /**
 * @brief Deze drive_task moet worden gestart als knopje hiervoor wordt ingedrukt.<BR>
@@ -195,21 +191,32 @@ void drive_task(void* argument)
 		ulTaskNotifyTake(0x00, portMAX_DELAY);
 		xSemaphoreTake(hGNRMC_Struct_Sem, portMAX_DELAY);
 
-		Average_Bepalen_Drive();
+		//Average_Bepalen_Drive();
 		int WPBehaald = Afstand_Course_Bepalen();
 
 		xSemaphoreGive(hGNRMC_Struct_Sem);
 
-		if(WPBehaald == 1 && WaypointIndex <= (int)argument) // als WPBehaald 1 is wordt de teller l verhoogd om het volgende waypoint aantegeven voor Afstand_course_Bepalen
+		if(WPBehaald == 1 && WaypointIndex <= HoeveelheidWaypoints) // als WPBehaald 1 is wordt de teller l verhoogd om het volgende waypoint aantegeven voor Afstand_course_Bepalen
+		{
 			WaypointIndex++;
+			if(WaypointIndex >= HoeveelheidWaypoints)
+			{
+				LCD_clear();
+				LCD_put("Alle Waypoints behaald yay");
+				xEventGroupSetBits(hKEY_Event, 0x0004);
+				continue;
+			}
+		}
 		Leaphy_Data_Sturen(Leaphy_Actie_Bepalen());
 
 		LCD_clear(); 						// LCD legen
 		LCD_putint(WaypointIndex); 			// waypoint nummer op LCD
 		LCD_put("/");
-		LCD_putint((int)argument);
+		LCD_putint(HoeveelheidWaypoints);
 		LCD_put(" Behaald");
+		LCD_put("    Afstand = ");
+		LCD_putint((int)vector.lengte);
 
-		osDelay(50);						// tijdelijke delay
+		osDelay(50);
 	}
 }

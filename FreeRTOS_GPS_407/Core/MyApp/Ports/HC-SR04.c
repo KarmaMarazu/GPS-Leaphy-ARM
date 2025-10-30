@@ -45,10 +45,12 @@ void GetDistance(void* argument)
 
 		distance = (val2-val1)* 0.034/2; 	// Afstand in cm berekenen met standaard formule
 
-		vTaskGetInfo(GetTaskhandle("drive_task"), &TaskDetails, pdFALSE, eInvalid);
-		if((TaskDetails.eCurrentState) != eSuspended)		// kijken of drivetask suspended is als ie dat niet is wordt een tasknotify gestuurd
-			xTaskNotifyGive(GetTaskhandle("drive_task"));
-
+		if(distance < 40)
+		{
+			vTaskGetInfo(GetTaskhandle("drive_task"), &TaskDetails, pdFALSE, eInvalid);
+			if((TaskDetails.eCurrentState) != eSuspended)		// kijken of drivetask suspended is als ie dat niet is wordt een tasknotify gestuurd
+				xTaskNotifyGive(GetTaskhandle("drive_task"));
+		}
 		osDelay(100);
 	}
 }

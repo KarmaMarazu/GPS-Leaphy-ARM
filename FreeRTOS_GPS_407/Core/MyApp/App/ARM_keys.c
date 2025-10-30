@@ -54,7 +54,6 @@ void ARM_keys_IRQ (void *argument)
 {
 	unsigned int 	key;
 	unsigned int 	j = 0;
-	int 			i = 0;
 	TickType_t		start = 0;
 	TickType_t		stop;
 	osThreadId_t 	hARM_keys;
@@ -110,9 +109,8 @@ void ARM_keys_IRQ (void *argument)
 			}
 			else if(j%2 == 1)
 			{
-				for (; waypoints[i].longitude != 0; i++){} 					// aantal gezette waypoints bepalen
-				UART_puts("\rwaypoints = "); UART_putint(i);
-				ptd->argument = (void *)(intptr_t)i;
+				for (HoeveelheidWaypoints = 0; waypoints[HoeveelheidWaypoints].longitude != 0; HoeveelheidWaypoints++){} 					// aantal gezette waypoints bepalen
+				UART_puts("\rwaypoints = "); UART_putint(HoeveelheidWaypoints);
 
 				xSemaphoreTake(hGNRMC_Struct_Sem, portMAX_DELAY);			// wacht totdat de task klaar is met de mutex
 				vTaskSuspend(GetTaskhandle("data_opslaanTask"));			// start de waypoints opslaan task
@@ -128,7 +126,10 @@ void ARM_keys_IRQ (void *argument)
 			}
 		}
 		if(key == 0x0003) // reset behaalde waypoints
+		{
+			HoeveelheidWaypoints = 0;
 			WaypointIndex = 0;
+		}
 
 		if(key == 0x000D)
 			PrintLog();
