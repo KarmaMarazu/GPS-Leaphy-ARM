@@ -127,6 +127,9 @@ void data_opslaanTask(void *argument)
 		{
 			memset(&waypoints, 0, sizeof(waypoints));
 			i = 0;
+			HoeveelheidWaypoints = 0;
+			WaypointIndex = 0;
+			ResetCourseIndex();
 			LCD_clear(); 												// LCD legen
 			LCD_putint(i); 												// waypoint nummer op LCD
 			LCD_put("/30 waypoints");

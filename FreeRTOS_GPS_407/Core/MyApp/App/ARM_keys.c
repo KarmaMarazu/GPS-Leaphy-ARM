@@ -130,6 +130,7 @@ void ARM_keys_IRQ (void *argument)
 		{
 			HoeveelheidWaypoints = 0;
 			WaypointIndex = 0;
+			ResetCourseIndex();
 		}
 
 		if(key == 0x000D)
