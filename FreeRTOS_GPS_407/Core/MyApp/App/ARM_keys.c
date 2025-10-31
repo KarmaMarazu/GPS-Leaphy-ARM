@@ -18,16 +18,45 @@
 
 void PrintLog(void)
 {
-	for(int i = 0; i<logIndex; i++)
+	double temp;
+
+	for (int i = 0; i < logIndex; i++)
 	{
-		UART_puts("\r\r\n=============================================================== Log Number = "); UART_putint(i);
-		UART_puts("\rStatus: "); UART_putchar((int)LogArray[i].Route.status);
-		UART_puts("\rLatitude: "); UART_putint((int)LogArray[i].Route.latitude);
-		UART_puts("\rLongitude: "); UART_putint((int)LogArray[i].Route.longitude);
-		UART_puts("\rcourse: "); UART_putint((int)LogArray[i].Route.course);
-		UART_puts("tijd sinds start rijden: "); UART_putint(LogArray[i].TijdSindsStart);
+		UART_puts("\r\r\n=============================================================== Log Number = ");
+		UART_putint(i);
+
+		UART_puts("\rStatus: ");
+		UART_putchar(LogArray[i].Route.status);
+
+		UART_puts("\rLatitude: ");
+		temp = LogArray[i].Route.latitude;
+		UART_putint((int)temp);
+		UART_putchar('.');
+		temp = (temp - (int)temp) * 10000000000;  // 10 decimalen uitprinten
+		UART_putint((int)temp);
+
+
+		UART_puts("\rLongitude: ");
+		temp = LogArray[i].Route.longitude;
+		UART_putint((int)temp);
+		UART_putchar('.');
+		temp = (temp - (int)temp) * 10000000000;
+		UART_putint((int)temp);
+
+
+		UART_puts("\rCourse: ");
+		temp = LogArray[i].Route.course;
+		UART_putint((int)temp);
+		UART_putchar('.');
+		temp = (temp - (int)temp) * 10000000000;
+		UART_putint((int)temp);
+
+
+		UART_puts("\rTijd sinds start rijden: ");
+		UART_putint(LogArray[i].TijdSindsStart);
 	}
 }
+
 
 
 /**
