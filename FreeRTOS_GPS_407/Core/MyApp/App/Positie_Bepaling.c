@@ -239,7 +239,7 @@ void drive_task(void* argument)
 
 		if(GemCourseIndex >= COURSEINDEXDREMPEL)
 		{
-			osDelay(1000);
+			osDelay(90);
 			ResetCourseIndex();
 		}
 
