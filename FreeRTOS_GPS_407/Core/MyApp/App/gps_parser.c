@@ -19,6 +19,7 @@ GNRMC gnrmc; 						  // global struct for GNRMC-messages
 Data_Parser GNRMC_data;
 Data_Parser average[3];				  // struct om een gemiddelde van de opgeslagen data te nemen als waypoint.
 Data_Parser waypoints[MAX_WAYPOINTS]; // struct waar in nuttige data in bruikbare cijfers wordt gezet.
+Vector vector;						  // struct voor de vector vanaf de Leaphy naar de waypoints
 struct Log DataLog;
 struct Log LogArray[MAX_LOGS];    	  // Array om logs op te slaan
 int logIndex = 0;                     // Huidige index in de array

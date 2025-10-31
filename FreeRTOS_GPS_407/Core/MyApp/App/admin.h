@@ -29,7 +29,8 @@
 /// set software timer 500 msecs
 #define TIMER1_DELAY 500
 #define TIMERLOG_DELAY 3000
-#define TIMERCOURSE_DELAY 1000
+/// set max waypoints for gps_parser
+#define MAX_WAYPOINTS 30
 
 #define GPS_MAXLEN 79+4 /// $+CR+LF+'\0'
 /** The carriage return [CR] and the line feed [LF] combination terminate the sentence.
@@ -37,8 +38,7 @@
 * or less. This length limit excludes the $ and the [CR][LF] characters.
 * The data field block, including delimiters is limited to 74 characters or less.
 */
-/// set max waypoints for gps_parser
-#define MAX_WAYPOINTS 30
+
 /// struct voor taak-gegevens, waaronder de argumenten om een taak aan te maken
 typedef struct TaskData
 {
@@ -68,8 +68,6 @@ extern TimerHandle_t      hTimer1;
 /// handle voor log timer
 extern TimerHandle_t	  hTimerLog;
 
-extern TimerHandle_t	  hTimerCourse;
-
 /// debug naar uart output, zie uart_keys.c
 /// bitmask-toggle key voor task-debug-output
 extern int Uart_debug_out;
@@ -88,16 +86,16 @@ extern int Uart_debug_out;
 #define STUDENT_DEBUG_OUT  	0x08
 /// bit 5: toggles gps uart1 output
 #define GPS_DEBUG_OUT 		0x10
-/// bit 6: toggles reserved2 output
-#define RES1_DEBUG_OUT 	    0x24
+/// bit 6: toggles drive mode output
+#define DRIVEMODE_DEBUG_OUT 0x24
 
 /// Redefine pins om beter aan te geven waar het om gaat: gekleurde ledjes
 /// LD4_Pin
 #define LEDGREEN  GPIO_PIN_12
 /// LD3_Pin
-#define LEDORANGE    GPIO_PIN_13
+#define LEDORANGE GPIO_PIN_13
 /// LD5_Pin
-#define LEDRED GPIO_PIN_14
+#define LEDRED 	  GPIO_PIN_14
 /// LD6_Pin
 #define LEDBLUE   GPIO_PIN_15
 
@@ -134,11 +132,11 @@ extern void GNRMC_Parser(void*);
 
 // Positie_bepaling.c
 extern void drive_task(void*);
+extern void ResetCourseIndex(void);
 
 // timer.c
 extern void Timer1_Handler(void);
 extern void TimerLog_Handler(void);
-extern void TimerCourse_Handler(void);
 
 // HC-SR04
 extern void GetDistance(void* );

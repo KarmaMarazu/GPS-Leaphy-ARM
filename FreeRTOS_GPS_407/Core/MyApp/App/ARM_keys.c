@@ -16,6 +16,13 @@
 #include "cmsis_os.h"
 #include "gps.h"
 
+
+/**
+* @brief Deze functie wordt aangeroepen als de log van de route uitgeprint moet worden.<BR>
+* De coordinaten zijn doubles en deze kunnen niet eenvoudig worden geprint dus dat moet slim worden geconverteerd naar een int.<BR>
+* Display data: Status, latitude, longitude, course en tijd van de log.
+* @return void.
+*/
 void PrintLog(void)
 {
 	double temp;
@@ -45,11 +52,7 @@ void PrintLog(void)
 
 
 		UART_puts("\rCourse: ");
-		temp = LogArray[i].Route.course;
-		UART_putint((int)temp);
-		UART_putchar('.');
-		temp = (temp - (int)temp) * 10000000000;
-		UART_putint((int)temp);
+		UART_putint((int)LogArray[i].Route.course);
 
 
 		UART_puts("\rTijd sinds start rijden: ");
@@ -180,7 +183,6 @@ void ARM_keys_IRQ (void *argument)
 void ARM_keys_task (void *argument)
 {
 	uint32_t 	 key;
-	//int			 i, led;
 
 	while(TRUE)
 	{

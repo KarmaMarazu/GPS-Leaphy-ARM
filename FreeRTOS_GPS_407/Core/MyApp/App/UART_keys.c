@@ -186,13 +186,11 @@ void UART_menu (void *argument)
 		  	  	  UART_puts("\r\nGPS output = ");
 		  	  	  UART_puts(Uart_debug_out & GPS_DEBUG_OUT ? "ON\r\n" : "OFF\r\n");
 				  break;
-//
-//		/// ... en reageert ook op een paar letters
-//		case 'D': /// D: Verandert de Default OSTIME-DELAY, die gebruikt wordt bij de LEDs.
-//				  /// commando: <b>"d,200"</b> betekent: set delay op 200, NB: spaties worden niet afgevangen...
-//				  os_delay = atoi(s+2); // skip first 2 characters
-//				  UART_puts("\r\n os_delay set to: "); UART_putint(os_delay);
-//				  break;
+
+		case '6': Uart_debug_out ^= DRIVEMODE_DEBUG_OUT; // toggle output on/off
+				  UART_puts("\r\nDrive mode output = ");
+				  UART_puts(Uart_debug_out & GPS_DEBUG_OUT ? "ON\r\n" : "OFF\r\n");
+				  break;
 
 		case 'M': DisplayMenu(); /// M: Displays het menu (zie my_app.c)
 				  break;

@@ -10,7 +10,11 @@
 
 // DEFINES start: ==================================================================================================
 // bepalen hoeveel logs er genomen worden.
-#define MAX_LOGS 100
+#define MAX_LOGS 200
+#define PI 3.1415926535
+#define r_aarde 6371000
+#define Waypoint_Drempel 3
+#define COURSEINDEXDREMPEL 3
 
 // enum voor NMEA protocolstrings (starting 'e' for enum)
 enum NMEA
@@ -26,6 +30,9 @@ enum NMEA
 int hex2int(char *c);
 int hexchar2int(char c);
 int checksum_valid(char *string);
+// functie om de LogArray te resetten staat in gps_parser.c
+void ResetLogArray(void);
+void ResetCourseIndex(void);
 // FUNCTIES stop: ==================================================================================================
 
 
@@ -75,15 +82,6 @@ struct Log
 	int		TijdSindsStart;
 };
 
-// Struct voor de data log deze kan uitgelezen worden door de debug poort aantesluiten op je laptop
-// en de terminal te openen zodra het juiste knopje is ingedrukt wordt deze struct geprint
-//typedef struct _DataLog
-//{
-//	TickType_t VerstrekenTijd;
-//	char ErrorLog [200][200];
-//	Data_Parser Route [200];
-//	char LeaphyActie[200];
-//} Data_Log;
 //STRUCTURES stop: ====================================================================================================
 
 
@@ -95,10 +93,10 @@ struct Log
 extern GNRMC gnrmc;
 /// struct om de string om te zetten naar cijfers
 extern Data_Parser GNRMC_data;
-/// struct om huidige positie in op te slaan
-extern Data_Parser Gem;
 /// array van structs om de waypoints van de route in op te slaan
 extern Data_Parser waypoints[MAX_WAYPOINTS];
+/// struct voor de vector vanaf de Leaphy naar de waypoints
+extern Vector vector;
 /// array van structs om hiervan een 1 gemiddelde waarde te maken
 extern Data_Parser average[3];
 /// struct om als verzamelplaats te fungeren voor data die gelogd moeten worden
@@ -106,15 +104,12 @@ extern struct Log DataLog;
 /// array van structs om hierin op te slaan wat er gebeurd terwijl in drive mode
 extern struct Log LogArray[MAX_LOGS];
 
-// functie om de LogArray te resetten staat in gps_parser.c
-extern void ResetLogArray(void);
-
 extern int WaypointIndex;
 
 extern int logIndex;
 
 extern int HoeveelheidWaypoints;
 
-// HC-SR04 afstand vanaf obstacle
+// HC-SR04 afstand vanaf obstacle in cm
 extern uint16_t distance;
 // EXTERNS stop: ==================================================================================================

@@ -49,7 +49,6 @@ SemaphoreHandle_t	  hLog_Struct_Sem;
 EventGroupHandle_t 	  hKEY_Event;
 TimerHandle_t         hTimer1;
 TimerHandle_t		  hTimerLog;
-TimerHandle_t		  hTimerCourse;
 
 
 /** tasks[] is een array van structures met alleen de argumenten om een taak aan te maken.
@@ -161,7 +160,7 @@ key: function\r\n\
  3 : [on/off] UART_keys output\r\n\
  4 : [on/off] STUDENT output\r\n\
  5 : [on/off] GPS output\r\n\
- d : change DELAY time (default 200), eg. 'd,50'\r\n\
+ 6 : [on/off] Drive mode output\r\n\
  p : change TASK PRIORITY, eg. 'p,7,20' sets priority of task 7 to 20\r\n\
  t : display TASK DATA (number, priority, stack usage, status)\r\n\
  s : start/stop TASK, eg. s,7 starts or stops task 7\r\n\
@@ -233,9 +232,6 @@ void CreateHandles(void)
 	if (!(hTimerLog = xTimerCreate("TimerLog", pdMS_TO_TICKS(TIMERLOG_DELAY), pdTRUE, 0, (TimerCallbackFunction_t)TimerLog_Handler)))
 			error_HaltOS("Error hTimerLog");
 
-	if (!(hTimerCourse = xTimerCreate("TimerCourse", pdMS_TO_TICKS(TIMERCOURSE_DELAY), pdTRUE, 0, (TimerCallbackFunction_t)TimerCourse_Handler)))
-				error_HaltOS("Error hTimerCourse");
-
 	UART_puts("\n\rAll handles created successfully.");
 
 	UART_puts("\n\rTimer set to: ");
@@ -270,11 +266,6 @@ void TimerLog_Handler(void)
 	    }
 
 	    xSemaphoreGive(hLog_Struct_Sem);							// geef mutex zodat er weer nieuwe data in de struct kan worden geschreven voor een nieuw log 'punt'
-
-}
-
-void TimerCourse_Handler(void)
-{
 
 }
 

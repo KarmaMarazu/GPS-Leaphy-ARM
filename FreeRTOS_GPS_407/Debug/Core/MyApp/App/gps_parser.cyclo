@@ -1,3 +1,4 @@
-../Core/MyApp/App/gps_parser.c:28:6:Average_Bepalen_Waypoints	1
-../Core/MyApp/App/gps_parser.c:43:6:GNRMC_Parser	3
-../Core/MyApp/App/gps_parser.c:93:6:data_opslaanTask	6
+../Core/MyApp/App/gps_parser.c:34:6:Average_Bepalen_Waypoints	1
+../Core/MyApp/App/gps_parser.c:45:6:ResetLogArray	1
+../Core/MyApp/App/gps_parser.c:61:6:GNRMC_Parser	4
+../Core/MyApp/App/gps_parser.c:119:6:data_opslaanTask	6

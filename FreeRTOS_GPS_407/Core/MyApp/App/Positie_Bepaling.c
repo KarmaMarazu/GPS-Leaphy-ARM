@@ -16,17 +16,13 @@
 #include "gps.h"
 #include <math.h>
 
-Vector vector;
-
-#define PI 3.1415926535
-#define r_aarde 6371000
-#define Waypoint_Drempel 3
-#define COURSEINDEXDREMPEL 3
+extern TIM_HandleTypeDef htim8;
 
 int WaypointIndex = 0; // globale teller voor de behaalde waypoints
 int GemCourseIndex = 0;
 int TotaleCourse = 0;
 
+// Resetten van de gemmidelde course die wordt berekend
 void ResetCourseIndex(void)
 {
 	GemCourseIndex = 0;
@@ -72,14 +68,7 @@ int Afstand_Course_Bepalen(void)
 	double x_c = cos(radPosLati) * sin(radWayLati) - sin(radPosLati) * cos(radWayLati) * cos(deltaLong);
 	vector.course = (int)(fmod(RtoD(atan2(y_c, x_c)) + 360.0, 360.0));
 
-	// Print voor het testen
-	UART_puts("\r\rAfstand tussen huidige positie en waypoint = "); UART_putint((int)vector.lengte);
-	//UART_puts("\rCourse Richting waypoint vanaf huidige positie = "); UART_putint((int)vector.course);
-	//UART_puts("\rlongi = "); UART_putint((int)(Gem.longitude*100000));
-	//UART_puts("\rlati = "); UART_putint((int)(Gem.latitude*100000));
-	//UART_puts("\rWPlongi = "); UART_putint((int)(waypoints[l].longitude));
-	//UART_puts("\rWPlati = "); UART_putint((int)(waypoints[l].latitude));
-	//UART_puts("\rHuidige Course = "); UART_putint((int)GNRMC_data.course);
+	// Bepalen of de Leaphy op de waypoint is
 	if(vector.lengte < Waypoint_Drempel)
 		return 1;
 	return 0;
@@ -93,43 +82,54 @@ int Afstand_Course_Bepalen(void)
 */
 char Leaphy_Actie_Bepalen(void)
 {
-	//return 0x01;
-	//UART_puts("\rAfstand = "); UART_putint(distance);
+	// Kijken of we binnen bereik zijn van de drempelwaarde met de HC-SR04
 	if(distance < 40)
 	{
 		ResetCourseIndex();
 		return 0x06;
 	}
 
-	if(GNRMC_data.course && GemCourseIndex < COURSEINDEXDREMPEL)
+	// Als er course data is bijvoegen in totale course en index verhogen om een gemmidelde course te kunnen berekenen
+	if(GNRMC_data.course && (GemCourseIndex < COURSEINDEXDREMPEL))
 	{
-		TotaleCourse += GNRMC_data.course;
+		TotaleCourse += GNRMC_data.course;	// Afgelopen courses bij elkaar optellen
 		GemCourseIndex++;
-		UART_puts("\rGemCourseIndex = "); UART_putint(GemCourseIndex);
+
+		if (Uart_debug_out & DRIVEMODE_DEBUG_OUT)
+		{
+			UART_puts("\rGemCourseIndex = "); UART_putint(GemCourseIndex);
+		}
+
+		// Als de drempel waarde van hoeveelheid punten nog niet overschreden is return 0x01
 		if(GemCourseIndex < COURSEINDEXDREMPEL)
 			return 0x01;
 	}
-	else if(!(GNRMC_data.course) && GemCourseIndex < COURSEINDEXDREMPEL)
+	// Als er geen course data is rechtdoor bljven lopen tot er wel data is
+	else if(!(GNRMC_data.course) && (GemCourseIndex < COURSEINDEXDREMPEL))
 		return 0x01;
+
+	// Gemmidelde course berekenen als sample size bereikt is
 	if(GemCourseIndex >= COURSEINDEXDREMPEL)
 	{
 		TotaleCourse = TotaleCourse / GemCourseIndex;
-		UART_puts("\rTotaleCourse = "); UART_putint(TotaleCourse);
 	}
 
-	int course = ((int)TotaleCourse + 360) % 360;
-	UART_puts("\rHuidigeCourse = "); UART_putint(course);
-	UART_puts("\rVectorCourse = "); UART_putint(vector.course);
-
+	int course = ((int)TotaleCourse + 360) % 360;	// Normaliseren van de course
 	int courseDiff = vector.course - course;
-	UART_puts("\rCourseDiff = "); UART_putint(courseDiff);
-	// Bepaal aan de hand van het verschil in course hoe erg er gecorrigeerd moet worden.
 
+	if (Uart_debug_out & DRIVEMODE_DEBUG_OUT)
+		{
+			UART_puts("\rHuidigeCourse = "); UART_putint(course);
+			UART_puts("\rTotaleCourse = "); UART_putint(TotaleCourse);
+			UART_puts("\rCourseDiff = "); UART_putint(courseDiff);
+		}
+
+	// Bepaal aan de hand van het verschil in course hoe erg er gecorrigeerd moet worden.
 	int absDiff = abs(courseDiff);
 	if(courseDiff < 0)
 	{
 		if(absDiff >= 180)
-			return 0x03;			// Snel Rechts
+			return 0x03;		// Snel Rechts
 		if(absDiff < 10)
 			return 0x01;		// Rechtdoor
 		if(absDiff < 150)
@@ -139,7 +139,7 @@ char Leaphy_Actie_Bepalen(void)
 	else if(courseDiff > 0)
 	{
 		if(courseDiff >= 180)
-			return 0x05;			// Snel Links
+			return 0x05;		// Snel Links
 		if(courseDiff < 10)
 			return 0x01;		// Rechtdoor
 		if(courseDiff < 150)
@@ -176,35 +176,28 @@ void Leaphy_Data_Sturen(char data)
 		HAL_GPIO_WritePin(GPIOE, Ard_Bit4_Pin, RESET);
 
 	// print voor het testen
-	switch(data)
+	if (Uart_debug_out & DRIVEMODE_DEBUG_OUT)
 	{
-	case 0x01:	UART_puts("\rRechtdoor");
-				break;
-	case 0x02:	UART_puts("\rLangzaam naar rechts");
-				break;
-	case 0x03:	UART_puts("\rSnel naar rechts");
-				break;
-	case 0x04:	UART_puts("\rLangzaam naar links");
-				break;
-	case 0x05:	UART_puts("\rSnel naar links");
-				break;
-	case 0x0F:  UART_puts("\rGeen course data beschikbaar");
-				break;
-	default:	UART_puts("\rError kan geen keuze maken");
-				break;
+		switch(data)
+		{
+		case 0x01:	UART_puts("\rRechtdoor");
+					break;
+		case 0x02:	UART_puts("\rLangzaam naar rechts");
+					break;
+		case 0x03:	UART_puts("\rSnel naar rechts");
+					break;
+		case 0x04:	UART_puts("\rLangzaam naar links");
+					break;
+		case 0x05:	UART_puts("\rSnel naar links");
+					break;
+		case 0x0F:  UART_puts("\rGeen course data beschikbaar");
+					break;
+		default:	UART_puts("\rError kan geen keuze maken");
+					break;
+		}
 	}
 }
 
-/**
-* @brief Functie om gemiddelde van 3 datapunten op de slaan voor nauwkeurigere locatie alleen de coordinaten want course kan ook 0 zijn waardoor het gemiddelde niet werkt.
-* @return void
-*//*
-void Average_Bepalen_Drive(void)
-{
-	// Gemiddelde nemen van de laatste 3 ingekomen gps berichten
-	Gem.latitude = (average[0].latitude + average[1].latitude + average[2].latitude)/3; 	// gemiddelde wordt berekend en opgeslagen
-	Gem.longitude = (average[0].longitude + average[1].longitude + average[2].longitude)/3;
-}*/
 
 /**
 * @brief Deze drive_task moet worden gestart als knopje hiervoor wordt ingedrukt.<BR>
@@ -213,44 +206,62 @@ void Average_Bepalen_Drive(void)
 */
 void drive_task(void* argument)
 {
+	HAL_TIM_PWM_Start(&htim8, TIM_CHANNEL_3);				// Starten PWM timer voor buzzer
+	uint16_t timer_arr = __HAL_TIM_GET_AUTORELOAD(&htim8);	// ARR ophalen van de timer
+
 	while(TRUE)
 	{
-		ulTaskNotifyTake(0x00, portMAX_DELAY);
+		ulTaskNotifyTake(0x00, portMAX_DELAY);				// Task notify ontvangen of van GNRMC_Parser of GetDistance
 		xSemaphoreTake(hGNRMC_Struct_Sem, portMAX_DELAY);
 
-		//Average_Bepalen_Drive();
-		int WPBehaald = Afstand_Course_Bepalen();
+		// Buzzer aansturen als er geen course data is
+		if(!(GNRMC_data.course))
+		{
+			// Buzzer aansturen
+			__HAL_TIM_SET_COMPARE(&htim8, TIM_CHANNEL_3, timer_arr * 0.20f);
+			osDelay(50);
+			__HAL_TIM_SET_COMPARE(&htim8, TIM_CHANNEL_3, timer_arr * 0.00f);
+		}
+		int WPBehaald = Afstand_Course_Bepalen();			// Berekenen wat de afstand en course is vanaf de Leaphy naar de huidige waypoint en returnt 1 of 0 afhankelijk van waypoint behaald
 
 		xSemaphoreGive(hGNRMC_Struct_Sem);
 
-		if((WPBehaald == 1) && (WaypointIndex <= HoeveelheidWaypoints) && (HoeveelheidWaypoints > 0)) // als WPBehaald 1 is wordt de teller l verhoogd om het volgende waypoint aantegeven voor Afstand_course_Bepalen
+		// als WPBehaald 1 is wordt de teller l verhoogd om het volgende waypoint aantegeven voor Afstand_course_Bepalen
+		if((WPBehaald == 1) && (WaypointIndex <= HoeveelheidWaypoints) && (HoeveelheidWaypoints > 0))
 		{
 			WaypointIndex++;
 			ResetCourseIndex();
+
+			// Buzzer aansturen
+			__HAL_TIM_SET_COMPARE(&htim8, TIM_CHANNEL_3, timer_arr * 0.50f);
+			osDelay(100);
+			__HAL_TIM_SET_COMPARE(&htim8, TIM_CHANNEL_3, timer_arr * 0.00f);
+
 			if(WaypointIndex >= HoeveelheidWaypoints)
 			{
 				LCD_clear();
-				LCD_put("Alle Waypoints behaald yay");
-				xEventGroupSetBits(hKEY_Event, 0x0004);
+				LCD_put("Alle Waypoints behaald");
+				xEventGroupSetBits(hKEY_Event, 0x0004); // Knop simuleren om drive mode uiteschakelen als alle waypoints behaald zijn
 				continue;
 			}
 		}
-		Leaphy_Data_Sturen(Leaphy_Actie_Bepalen());
 
+		Leaphy_Data_Sturen(Leaphy_Actie_Bepalen());	  	// Leaphy aansturen op basis van gemmidelde course, huidige locatie en waypoint
+
+		// Resetten van de course index als de sample size is bereikt
 		if(GemCourseIndex >= COURSEINDEXDREMPEL)
 		{
 			osDelay(90);
 			ResetCourseIndex();
 		}
 
-		LCD_clear(); 						// LCD legen
-		LCD_putint(WaypointIndex); 			// waypoint nummer op LCD
+		// Displayen van hoeveel waypoints behaald zijn en afstand tot volgende waypoint
+		LCD_clear();
+		LCD_putint(WaypointIndex);
 		LCD_put("/");
 		LCD_putint(HoeveelheidWaypoints);
 		LCD_put(" Behaald");
 		LCD_put("    Afstand = ");
 		LCD_putint((int)vector.lengte);
-
-		osDelay(50);
 	}
 }

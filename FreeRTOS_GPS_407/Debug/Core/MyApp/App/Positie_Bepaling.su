@@ -1,7 +1,7 @@
-../Core/MyApp/App/Positie_Bepaling.c:27:8:DtoR	16	static
-../Core/MyApp/App/Positie_Bepaling.c:33:8:RtoD	16	static
-../Core/MyApp/App/Positie_Bepaling.c:43:6:Afstand_Course_Bepalen	88	static
-../Core/MyApp/App/Positie_Bepaling.c:75:6:Leaphy_Actie_Bepalen	32	static
-../Core/MyApp/App/Positie_Bepaling.c:116:6:Leaphy_Data_Sturen	16	static
-../Core/MyApp/App/Positie_Bepaling.c:161:6:Average_Bepalen_Drive	16	static
-../Core/MyApp/App/Positie_Bepaling.c:177:6:drive_task	24	static
+../Core/MyApp/App/Positie_Bepaling.c:26:6:ResetCourseIndex	4	static
+../Core/MyApp/App/Positie_Bepaling.c:33:8:DtoR	16	static
+../Core/MyApp/App/Positie_Bepaling.c:39:8:RtoD	16	static
+../Core/MyApp/App/Positie_Bepaling.c:49:5:Afstand_Course_Bepalen	96	static
+../Core/MyApp/App/Positie_Bepaling.c:83:6:Leaphy_Actie_Bepalen	24	static
+../Core/MyApp/App/Positie_Bepaling.c:157:6:Leaphy_Data_Sturen	16	static
+../Core/MyApp/App/Positie_Bepaling.c:207:6:drive_task	24	static
