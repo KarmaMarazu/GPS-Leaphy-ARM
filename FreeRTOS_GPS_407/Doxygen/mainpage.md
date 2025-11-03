@@ -161,7 +161,7 @@ Sourcefiles: samenhang van de applicatie</h1>
 Hieronder zie je de voor deze applicatie belangrijkste bestanden. De applicatie bevindt zich 
 in de map **Core**, en wel hoofdzakelijk in de map **MyApp**, die weer verdeeld is in App en Ports. Daarnaast zie je in Core nog de map **Src**, die door STM gegenereerde bestanden bevat.
 
-<table  border='1' style="margin-left:30px; font-family:'Corbel'; font-size:11pt; background-color: #43344d; border-style:solid;">
+<table  border='1' style="margin-left:30px; font-family:'Corbel'; font-size:11pt; background-color: #FFFFFF; border-style:solid;">
     <tr>
         <td>**[Core/Src]**</td>
         <td>**Bevat de door STM gegenereerde bestanden**</td>
@@ -239,5 +239,6 @@ in de map **Core**, en wel hoofdzakelijk in de map **MyApp**, die weer verdeeld 
         <td>De bestuuring van de UART</td>
     </tr>
 </table>
+
 
 <br>
